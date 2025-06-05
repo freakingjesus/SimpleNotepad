@@ -17,6 +17,7 @@
 const textarea = document.getElementById('note');
 const status = document.getElementById('status');
 const STORAGE_KEY = 'notepad-content';
+
 // URL of the sync server. Change this if you host the server elsewhere.
 const SERVER_URL = 'http://localhost:3000';
 
@@ -45,6 +46,7 @@ function save() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content })
   }).catch(() => {});
+  
   status.textContent = 'Saved';
   setTimeout(() => {
     if (status.textContent === 'Saved') status.textContent = '';

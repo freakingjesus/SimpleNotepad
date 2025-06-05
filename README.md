@@ -27,9 +27,4 @@ different browsers or devices, run the included Node.js server:
 ```bash
 npm install express cors
 node server.js
-```
-
-Edit `SERVER_URL` in `index.html` to point to where the server is running.
-When the page loads, it fetches the saved notes from the server and stores
-new changes there as you type.
 
