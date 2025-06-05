@@ -18,12 +18,35 @@ const textarea = document.getElementById('note');
 const status = document.getElementById('status');
 const STORAGE_KEY = 'notepad-content';
 
-function load() {
+// URL of the sync server. Change this if you host the server elsewhere.
+const SERVER_URL = 'http://localhost:3000';
+
+function loadLocal() {
   textarea.value = localStorage.getItem(STORAGE_KEY) || '';
 }
 
+function load() {
+  loadLocal();
+  fetch(`${SERVER_URL}/notes`)
+    .then(r => r.ok ? r.text() : '')
+    .then(text => {
+      if (text) {
+        textarea.value = text;
+        localStorage.setItem(STORAGE_KEY, text);
+      }
+    })
+    .catch(() => {});
+}
+
 function save() {
-  localStorage.setItem(STORAGE_KEY, textarea.value);
+  const content = textarea.value;
+  localStorage.setItem(STORAGE_KEY, content);
+  fetch(`${SERVER_URL}/notes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  }).catch(() => {});
+  
   status.textContent = 'Saved';
   setTimeout(() => {
     if (status.textContent === 'Saved') status.textContent = '';
