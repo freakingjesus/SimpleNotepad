@@ -1,46 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>Simple Timer</title>
+<meta charset="UTF-8">
+<title>Simple Notepad</title>
 <style>
-  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
-  #time { font-size: 48px; margin: 20px; }
-  button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+  body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+  textarea { width: 100%; height: 80vh; font-size: 16px; }
+  #status { font-size: 14px; color: #555; margin-top: 5px; }
 </style>
 </head>
 <body>
-<h1>Simple Timer</h1>
-<div id="time">00:00</div>
-<div>
-  <button id="start">Start</button>
-  <button id="stop">Stop</button>
-  <button id="reset">Reset</button>
-</div>
+<h1>Simple Notepad</h1>
+<textarea id="note" placeholder="Start typing..."></textarea>
+<div id="status"></div>
 <script>
-let intervalId;
-let totalSeconds = 0;
-function updateDisplay() {
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-  const seconds = String(totalSeconds % 60).padStart(2, '0');
-  document.getElementById('time').textContent = `${minutes}:${seconds}`;
+const textarea = document.getElementById('note');
+const status = document.getElementById('status');
+const STORAGE_KEY = 'notepad-content';
+
+function load() {
+  textarea.value = localStorage.getItem(STORAGE_KEY) || '';
 }
-function startTimer() {
-  if (intervalId) return;
-  intervalId = setInterval(() => { totalSeconds++; updateDisplay(); }, 1000);
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, textarea.value);
+  status.textContent = 'Saved';
+  setTimeout(() => {
+    if (status.textContent === 'Saved') status.textContent = '';
+  }, 1000);
 }
-function stopTimer() {
-  clearInterval(intervalId);
-  intervalId = null;
-}
-function resetTimer() {
-  stopTimer();
-  totalSeconds = 0;
-  updateDisplay();
-}
-document.getElementById('start').addEventListener('click', startTimer);
-document.getElementById('stop').addEventListener('click', stopTimer);
-document.getElementById('reset').addEventListener('click', resetTimer);
+
+textarea.addEventListener('input', save);
+
+load();
 </script>
 </body>
 </html>
