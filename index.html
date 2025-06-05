@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple Notepad</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+  textarea { width: 100%; height: 80vh; font-size: 16px; }
+  #status { font-size: 14px; color: #555; margin-top: 5px; }
+</style>
+</head>
+<body>
+<h1>Simple Notepad</h1>
+<textarea id="note" placeholder="Start typing..."></textarea>
+<div id="status"></div>
+<script>
+const textarea = document.getElementById('note');
+const status = document.getElementById('status');
+const STORAGE_KEY = 'notepad-content';
+// URL of the sync server. Change this if you host the server elsewhere.
+const SERVER_URL = 'http://localhost:3000';
+
+function loadLocal() {
+  textarea.value = localStorage.getItem(STORAGE_KEY) || '';
+}
+
+function load() {
+  loadLocal();
+  fetch(`${SERVER_URL}/notes`)
+    .then(r => r.ok ? r.text() : '')
+    .then(text => {
+      if (text) {
+        textarea.value = text;
+        localStorage.setItem(STORAGE_KEY, text);
+      }
+    })
+    .catch(() => {});
+}
+
+function save() {
+  const content = textarea.value;
+  localStorage.setItem(STORAGE_KEY, content);
+  fetch(`${SERVER_URL}/notes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  }).catch(() => {});
+  status.textContent = 'Saved';
+  setTimeout(() => {
+    if (status.textContent === 'Saved') status.textContent = '';
+  }, 1000);
+}
+
+textarea.addEventListener('input', save);
+
+load();
+</script>
+</body>
+</html>
