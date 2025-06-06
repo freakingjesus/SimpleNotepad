@@ -45,6 +45,3 @@ npm test
 This executes the Mocha test suite that verifies `loadNotes()` and
 `saveNotes()` work correctly.
 
-## Box Breathing App
-
-The repository also includes `box-breathing.html`, a small tool that guides you through box breathing. A dot travels around a square and each side represents one phase of the breath. Use the slider on the page to set how many seconds each side should take (from 3–10 seconds). Because it's a single HTML file with no build step, you can host it with GitHub Pages just like `index.html`.
