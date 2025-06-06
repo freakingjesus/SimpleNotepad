@@ -27,5 +27,8 @@ The notepad stores data in your browser by default. To share notes between
 different browsers or devices, run the included Node.js server:
 
 ```bash
-npm install express cors
-node server.js
+npm install
+npm start
+```
+
+This runs the `start` script defined in `package.json`.
