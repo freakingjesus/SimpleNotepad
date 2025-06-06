@@ -10,26 +10,35 @@ const FILE = path.join(__dirname, 'notes.txt');
 app.use(cors());
 app.use(express.json());
 
-function loadNotes() {
+async function loadNotes() {
   try {
-    return fs.readFileSync(FILE, 'utf8');
+    return await fs.promises.readFile(FILE, 'utf8');
   } catch (err) {
     return '';
   }
 }
 
-function saveNotes(content) {
-  fs.writeFileSync(FILE, content, 'utf8');
+async function saveNotes(content) {
+  await fs.promises.writeFile(FILE, content, 'utf8');
 }
 
-app.get('/notes', (req, res) => {
-  res.type('text/plain').send(loadNotes());
+app.get('/notes', async (req, res) => {
+  try {
+    const content = await loadNotes();
+    res.type('text/plain').send(content);
+  } catch (err) {
+    res.sendStatus(500);
+  }
 });
 
-app.post('/notes', (req, res) => {
+app.post('/notes', async (req, res) => {
   if (typeof req.body.content === 'string') {
-    saveNotes(req.body.content);
-    res.sendStatus(200);
+    try {
+      await saveNotes(req.body.content);
+      res.sendStatus(200);
+    } catch (err) {
+      res.sendStatus(500);
+    }
   } else {
     res.sendStatus(400);
   }
