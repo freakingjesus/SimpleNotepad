@@ -23,7 +23,7 @@
   #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
   #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
   #bulletBtn {
-    margin: 0.5em 0;
+    margin: 0.5em auto;
     display: block;
     width: 2em;
     height: 2em;
@@ -55,7 +55,6 @@ const syncIndicator = document.getElementById('syncIndicator');
 const syncTime = document.getElementById('syncTime');
 const LAST_SYNC_KEY = 'last-sync-time';
 const STORAGE_KEY = 'notepad-content';
-// URL of the sync server. Change this if you host the server elsewhere.
 const SERVER_URL = 'https://testing-39z9.onrender.com';
 
 function loadLocal() {
