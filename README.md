@@ -28,3 +28,8 @@ different browsers or devices, run the included Node.js server:
 npm install express cors
 node server.js
 
+```
+
+## Box Breathing Page
+
+Try the new box breathing exercise by opening `breathing.html`. Each phase lasts four seconds and the square changes to guide your breathing rhythm.
