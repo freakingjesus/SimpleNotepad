@@ -22,7 +22,20 @@
   #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
   #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
   #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
-  #bulletBtn { margin-top: 0.5em; }
+  #bulletBtn {
+    margin: 0.5em auto;
+    display: block;
+    width: 2em;
+    height: 2em;
+    font-size: 1.25rem;
+    line-height: 2em;
+    text-align: center;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+  }
   @media (min-width: 600px) {
     body { max-width: 800px; }
     textarea { min-height: 80vh; }
@@ -31,10 +44,10 @@
 </head>
 <body>
 <h1>Simple Notepad</h1>
+<button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
 <textarea id="note" placeholder="Start typing..."></textarea>
-<button id="bulletBtn" type="button">Add Bullet</button>
-<div id="status"></div>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
+<div id="status"></div>
 <script>
 const textarea = document.getElementById('note');
 const status = document.getElementById('status');
