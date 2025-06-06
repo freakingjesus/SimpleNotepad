@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Simple Notepad</title>
+  <link rel="icon" href="data:,">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
     textarea { width: 100%; height: 80vh; font-size: 16px; }
@@ -18,8 +19,6 @@
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
     const STORAGE_KEY = 'notepad-content';
-
-    // URL of the sync server. Change this if you host the server elsewhere.
     const SERVER_URL = 'https://testing-39z9.onrender.com';
 
     function loadLocal() {
@@ -36,7 +35,9 @@
             localStorage.setItem(STORAGE_KEY, text);
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          status.textContent = 'Unable to reach server';
+        });
     }
 
     function save() {
@@ -46,7 +47,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content })
-      }).catch(() => {});
+      }).catch(() => {
+        status.textContent = 'Unable to reach server';
+      });
 
       status.textContent = 'Saved';
       setTimeout(() => {

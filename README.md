@@ -27,4 +27,3 @@ different browsers or devices, run the included Node.js server:
 ```bash
 npm install express cors
 node server.js
-
