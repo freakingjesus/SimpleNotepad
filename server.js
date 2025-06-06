@@ -44,6 +44,11 @@ app.post('/notes', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Notepad server listening on port ${PORT}`);
-});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Notepad server listening on port ${PORT}`);
+  });
+}
+
+module.exports = { loadNotes, saveNotes };

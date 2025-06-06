@@ -32,3 +32,15 @@ npm start
 ```
 
 This runs the `start` script defined in `package.json`.
+
+## Running Tests
+
+The repository includes automated tests for the server logic. After installing
+dependencies with `npm install`, run:
+
+```bash
+npm test
+```
+
+This executes the Mocha test suite that verifies `loadNotes()` and
+`saveNotes()` work correctly.
