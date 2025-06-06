@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple Notepad</title>
+<link rel="icon" href="data:,">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 1rem;
+    max-width: 60ch;
+  }
+  textarea {
+    width: 100%;
+    min-height: 70vh;
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    box-sizing: border-box;
+  }
+  h1 { text-align: center; }
+  #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
+  @media (min-width: 600px) {
+    body { max-width: 800px; }
+    textarea { min-height: 80vh; }
+  }
+</style>
+</head>
+<body>
+<h1>Simple Notepad</h1>
+<textarea id="note" placeholder="Start typing..."></textarea>
+<div id="status"></div>
+<script>
+const textarea = document.getElementById('note');
+const status = document.getElementById('status');
+const STORAGE_KEY = 'notepad-content';
+// URL of the sync server. Change this if you host the server elsewhere.
+const SERVER_URL = 'https://testing-39z9.onrender.com';
+
+function loadLocal() {
+  textarea.value = localStorage.getItem(STORAGE_KEY) || '';
+}
+
+function load() {
+  loadLocal();
+  fetch(`${SERVER_URL}/notes`)
+    .then(r => r.ok ? r.text() : '')
+    .then(text => {
+      if (text) {
+        textarea.value = text;
+        localStorage.setItem(STORAGE_KEY, text);
+      }
+    })
+    .catch(() => {
+      status.textContent = 'Unable to reach server';
+    });
+}
+
+function save() {
+  const content = textarea.value;
+  localStorage.setItem(STORAGE_KEY, content);
+  fetch(`${SERVER_URL}/notes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  }).catch(() => {
+    status.textContent = 'Unable to reach server';
+  });
+  status.textContent = 'Saved';
+  setTimeout(() => {
+    if (status.textContent === 'Saved') status.textContent = '';
+  }, 1000);
+}
+
+textarea.addEventListener('input', save);
+
+load();
+</script>
+</body>
+</html>
