@@ -1,8 +1,10 @@
 # Testing Repo
 
-This repository contains a simple notepad web app. Open `index.html` in your web
-browser and begin typing to save notes. Your text is automatically stored in the
-browser so you can return to the page later and continue where you left off.
+This repository contains a simple notepad web app. Open `index.html` in
+your web browser and begin typing to save notes. Your text is automatically
+stored in the browser so you can return to the page later and continue where you
+left off. The layout now adapts better to small screens so you can comfortably
+use it on phones and tablets.
 
 ## Hosting with GitHub Pages
 
