@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Box Breathing</title>
+<style>
+  :root {
+    --time: 4; /* seconds per side */
+  }
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 1rem;
+  }
+  #box {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border: 2px solid #333;
+    margin: 2rem 0;
+  }
+  #dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4a90e2;
+    animation: move calc(var(--time) * 4s) linear infinite;
+  }
+  @keyframes move {
+    0%   { left: 0; top: 0; }
+    25%  { left: calc(100% - 20px); top: 0; }
+    50%  { left: calc(100% - 20px); top: calc(100% - 20px); }
+    75%  { left: 0; top: calc(100% - 20px); }
+    100% { left: 0; top: 0; }
+  }
+  #controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
+</head>
+<body>
+<h1>Box Breathing</h1>
+<div id="box">
+  <div id="dot"></div>
+</div>
+<div id="controls">
+  <label for="timeRange">Seconds per side:</label>
+  <input type="range" id="timeRange" min="3" max="10" value="4">
+  <span id="timeDisplay">4</span>s
+</div>
+<script>
+const range = document.getElementById('timeRange');
+const display = document.getElementById('timeDisplay');
+function update() {
+  document.documentElement.style.setProperty('--time', range.value);
+  display.textContent = range.value;
+  // restart animation by toggling class
+  const dot = document.getElementById('dot');
+  dot.style.animation = 'none';
+  void dot.offsetWidth; // trigger reflow
+  dot.style.animation = '';
+}
+range.addEventListener('input', update);
+</script>
+</body>
+</html>
