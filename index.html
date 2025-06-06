@@ -22,6 +22,7 @@
   #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
   #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
   #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
+  #bulletBtn { margin-top: 0.5em; }
   @media (min-width: 600px) {
     body { max-width: 800px; }
     textarea { min-height: 80vh; }
@@ -31,6 +32,7 @@
 <body>
 <h1>Simple Notepad</h1>
 <textarea id="note" placeholder="Start typing..."></textarea>
+<button id="bulletBtn" type="button">Add Bullet</button>
 <div id="status"></div>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
 <script>
@@ -66,6 +68,27 @@ function setSync(success) {
     syncIndicator.style.background = 'red';
     syncTime.textContent = `Sync failed: ${now.toLocaleString()}`;
   }
+}
+
+function addBullet() {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+
+  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+  let lineEnd = text.indexOf('\n', end);
+  if (lineEnd === -1) lineEnd = text.length;
+
+  const before = text.slice(0, lineStart);
+  const after = text.slice(lineEnd);
+  const lines = text.slice(lineStart, lineEnd).split('\n');
+  const bullet = '• ';
+  const withBullets = lines.map(l => l.startsWith(bullet) ? l : bullet + l).join('\n');
+
+  textarea.value = before + withBullets + after;
+  textarea.selectionStart = lineStart;
+  textarea.selectionEnd = lineStart + withBullets.length;
+  save();
 }
 
 function load() {
@@ -108,6 +131,7 @@ function save() {
 }
 
 textarea.addEventListener('input', save);
+document.getElementById('bulletBtn').addEventListener('click', addBullet);
 
 load();
 </script>
