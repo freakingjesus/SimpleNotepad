@@ -20,6 +20,8 @@
   }
   h1 { text-align: center; }
   #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
+  #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
+  #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
   @media (min-width: 600px) {
     body { max-width: 800px; }
     textarea { min-height: 80vh; }
@@ -30,9 +32,13 @@
 <h1>Simple Notepad</h1>
 <textarea id="note" placeholder="Start typing..."></textarea>
 <div id="status"></div>
+<div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
 <script>
 const textarea = document.getElementById('note');
 const status = document.getElementById('status');
+const syncIndicator = document.getElementById('syncIndicator');
+const syncTime = document.getElementById('syncTime');
+const LAST_SYNC_KEY = 'last-sync-time';
 const STORAGE_KEY = 'notepad-content';
 // URL of the sync server. Change this if you host the server elsewhere.
 const SERVER_URL = 'https://testing-39z9.onrender.com';
@@ -41,8 +47,30 @@ function loadLocal() {
   textarea.value = localStorage.getItem(STORAGE_KEY) || '';
 }
 
+function loadLastSync() {
+  const t = localStorage.getItem(LAST_SYNC_KEY);
+  if (t) {
+    const date = new Date(t);
+    syncTime.textContent = `Last sync: ${date.toLocaleString()}`;
+    syncIndicator.style.background = 'green';
+  }
+}
+
+function setSync(success) {
+  const now = new Date();
+  if (success) {
+    syncIndicator.style.background = 'green';
+    syncTime.textContent = `Last sync: ${now.toLocaleString()}`;
+    localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
+  } else {
+    syncIndicator.style.background = 'red';
+    syncTime.textContent = `Sync failed: ${now.toLocaleString()}`;
+  }
+}
+
 function load() {
   loadLocal();
+  loadLastSync();
   fetch(`${SERVER_URL}/notes`)
     .then(r => r.ok ? r.text() : '')
     .then(text => {
@@ -50,9 +78,11 @@ function load() {
         textarea.value = text;
         localStorage.setItem(STORAGE_KEY, text);
       }
+      setSync(true);
     })
     .catch(() => {
       status.textContent = 'Unable to reach server';
+      setSync(false);
     });
 }
 
@@ -63,9 +93,14 @@ function save() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content })
-  }).catch(() => {
-    status.textContent = 'Unable to reach server';
-  });
+  })
+    .then(r => {
+      if (r.ok) setSync(true); else setSync(false);
+    })
+    .catch(() => {
+      status.textContent = 'Unable to reach server';
+      setSync(false);
+    });
   status.textContent = 'Saved';
   setTimeout(() => {
     if (status.textContent === 'Saved') status.textContent = '';
