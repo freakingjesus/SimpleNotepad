@@ -55,7 +55,6 @@ const syncIndicator = document.getElementById('syncIndicator');
 const syncTime = document.getElementById('syncTime');
 const LAST_SYNC_KEY = 'last-sync-time';
 const STORAGE_KEY = 'notepad-content';
-// URL of the sync server. Change this if you host the server elsewhere.
 const SERVER_URL = 'https://testing-39z9.onrender.com';
 
 function loadLocal() {
@@ -83,7 +82,7 @@ function setSync(success) {
   }
 }
 
-function addBullet() {
+function toggleBullet() {
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
@@ -96,11 +95,13 @@ function addBullet() {
   const after = text.slice(lineEnd);
   const lines = text.slice(lineStart, lineEnd).split('\n');
   const bullet = '• ';
-  const withBullets = lines.map(l => l.startsWith(bullet) ? l : bullet + l).join('\n');
+  const toggled = lines
+    .map(l => l.startsWith(bullet) ? l.slice(bullet.length) : bullet + l)
+    .join('\n');
 
-  textarea.value = before + withBullets + after;
+  textarea.value = before + toggled + after;
   textarea.selectionStart = lineStart;
-  textarea.selectionEnd = lineStart + withBullets.length;
+  textarea.selectionEnd = lineStart + toggled.length;
   save();
 }
 
@@ -144,7 +145,7 @@ function save() {
 }
 
 textarea.addEventListener('input', save);
-document.getElementById('bulletBtn').addEventListener('click', addBullet);
+document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
 
 load();
 </script>
