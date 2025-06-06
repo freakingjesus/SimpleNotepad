@@ -4,7 +4,8 @@
   "description": "This repository contains a simple notepad web app. Open `index.html` in your web browser and begin typing to save notes. Your text is automatically stored in the browser so you can return to the page later and continue where you left off.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node ./node_modules/mocha/bin/mocha"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +14,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.5.0"
   }
 }
