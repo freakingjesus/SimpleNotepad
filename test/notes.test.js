@@ -14,18 +14,21 @@ describe('loadNotes and saveNotes', () => {
     if (fs.existsSync(FILE)) fs.unlinkSync(FILE);
   });
 
-  it('returns empty string when file is missing', () => {
-    expect(loadNotes()).to.equal('');
+  it('returns empty string when file is missing', async () => {
+    const result = await loadNotes();
+    expect(result).to.equal('');
   });
 
-  it('saves and loads content', () => {
-    saveNotes('hello');
-    expect(loadNotes()).to.equal('hello');
+  it('saves and loads content', async () => {
+    await saveNotes('hello');
+    const result = await loadNotes();
+    expect(result).to.equal('hello');
   });
 
-  it('overwrites existing content', () => {
-    saveNotes('first');
-    saveNotes('second');
-    expect(loadNotes()).to.equal('second');
+  it('overwrites existing content', async () => {
+    await saveNotes('first');
+    await saveNotes('second');
+    const result = await loadNotes();
+    expect(result).to.equal('second');
   });
 });
