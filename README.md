@@ -41,6 +41,17 @@ GEMINI_API_KEY=your_key npm start
 
 This runs the `start` script defined in `package.json`.
 
+## Setting `GEMINI_API_KEY` in Production
+
+On a hosting provider like [Render](https://render.com/), set the
+`GEMINI_API_KEY` environment variable through the dashboard:
+
+1. Open your service in the Render dashboard.
+2. Go to **Environment** → **Add Environment Variable** and enter your key.
+
+After changing the value, redeploy or restart the service so the new key takes
+effect.
+
 ## Running Tests
 
 The repository includes automated tests for the server logic. After installing
