@@ -147,7 +147,19 @@ function toggleBullet() {
   const lines = text.slice(lineStart, lineEnd).split('\n');
   const bullet = '• ';
   const toggled = lines
-    .map(l => l.startsWith(bullet) ? l.slice(bullet.length) : bullet + l)
+    .map(l => {
+      const m = l.match(/^(\s*)(.*)$/);
+      let indent = m[1];
+      let rest = m[2];
+      if (rest.startsWith(bullet)) {
+        rest = rest.slice(bullet.length);
+        if (indent.startsWith('    ')) indent = indent.slice(4);
+        else if (indent.startsWith('\t')) indent = indent.slice(1);
+        return indent + rest;
+      }
+      indent = '    ' + indent;
+      return indent + bullet + rest;
+    })
     .join('\n');
 
   textarea.value = before + toggled + after;
