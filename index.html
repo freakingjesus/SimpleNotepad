@@ -151,6 +151,7 @@ function indentSelection() {
   pushUndo(textarea.value);
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
+  const scrollPos = textarea.scrollTop;
   const text = textarea.value;
 
   let lineStart = text.lastIndexOf('\n', start - 1) + 1;
@@ -166,6 +167,7 @@ function indentSelection() {
   textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + indented.length;
+  textarea.scrollTop = scrollPos;
   lastValue = textarea.value;
   save();
 }
@@ -174,6 +176,7 @@ function outdentSelection() {
   pushUndo(textarea.value);
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
+  const scrollPos = textarea.scrollTop;
   const text = textarea.value;
 
   let lineStart = text.lastIndexOf('\n', start - 1) + 1;
@@ -196,6 +199,7 @@ function outdentSelection() {
   textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + outdented.length;
+  textarea.scrollTop = scrollPos;
   lastValue = textarea.value;
   save();
 }
