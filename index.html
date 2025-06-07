@@ -290,6 +290,33 @@ document.getElementById('undoBtn').addEventListener('click', undo);
 document.getElementById('redoBtn').addEventListener('click', redo);
 document.getElementById('geminiBtn').addEventListener('click', runGemini);
 
+textarea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && textarea.selectionStart === textarea.selectionEnd) {
+    const pos = textarea.selectionStart;
+    const text = textarea.value;
+    const bullet = '• ';
+    let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+    let i = lineStart;
+    let indent = '';
+    while (i < text.length && (text[i] === ' ' || text[i] === '\t')) {
+      indent += text[i++];
+    }
+    if (text.slice(i, i + bullet.length) === bullet) {
+      e.preventDefault();
+      pushUndo(textarea.value);
+      const before = text.slice(0, pos);
+      const after = text.slice(pos);
+      const insert = '\n' + indent + bullet;
+      textarea.value = before + insert + after;
+      const newPos = pos + insert.length;
+      textarea.selectionStart = textarea.selectionEnd = newPos;
+      textarea.scrollTop = textarea.scrollTop;
+      lastValue = textarea.value;
+      save();
+    }
+  }
+});
+
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
     e.preventDefault();
