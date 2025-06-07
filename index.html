@@ -39,6 +39,13 @@
     padding: 0;
     cursor: pointer;
   }
+  #geminiResult {
+    font-size: 0.875rem;
+    line-height: 2em;
+    margin-left: 0.5em;
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
   @media (min-width: 600px) {
     body { max-width: 800px; }
     textarea { min-height: 80vh; }
@@ -53,12 +60,12 @@
   <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
   <button id="undoBtn" type="button" aria-label="Undo">↺</button>
   <button id="redoBtn" type="button" aria-label="Redo">↻</button>
-  <button id="geminiBtn" type="button" aria-label="Gemini">Gemini</button>
+  <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
+  <span id="geminiResult"></span>
 </div>
 <textarea id="note" placeholder="Start typing..."></textarea>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
 <div id="status"></div>
-<span id="geminiResult"></span>
 <script>
 const textarea = document.getElementById('note');
 const status = document.getElementById('status');
