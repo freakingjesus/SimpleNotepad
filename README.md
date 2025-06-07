@@ -32,6 +32,13 @@ npm install
 npm start
 ```
 
+To enable the optional Gemini integration, provide your Google API key when
+starting the server:
+
+```bash
+GEMINI_API_KEY=your_key npm start
+```
+
 This runs the `start` script defined in `package.json`.
 
 ## Running Tests
