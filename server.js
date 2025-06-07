@@ -65,14 +65,17 @@ app.post('/gemini', async (req, res) => {
       })
     });
     if (!response.ok) {
-      return res.sendStatus(500);
+      const errText = await response.text();
+      console.error('Gemini API error:', errText);
+      return res.status(500).json({ error: 'Gemini API error' });
     }
     const data = await response.json();
     const text =
       data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     res.json({ text });
   } catch (err) {
-    res.sendStatus(500);
+    console.error('Gemini handler error:', err);
+    res.status(500).json({ error: err.message || 'Gemini request failed' });
   }
 });
 

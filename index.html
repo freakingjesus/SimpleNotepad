@@ -262,9 +262,13 @@ function runGemini() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt })
   })
-    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(r => r.json())
     .then(data => {
-      geminiResult.textContent = data.text || '';
+      if (data.error) {
+        geminiResult.textContent = data.error;
+      } else {
+        geminiResult.textContent = data.text || '';
+      }
     })
     .catch(() => {
       geminiResult.textContent = 'Error contacting Gemini';
