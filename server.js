@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 const FILE = path.join(__dirname, 'notes.txt');
 
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+  'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent';
 
 app.use(cors());
 app.use(express.json());
