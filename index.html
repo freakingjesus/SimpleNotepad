@@ -22,9 +22,12 @@
   #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
   #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
   #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
-  #bulletBtn {
-    margin: 0.5em auto;
-    display: block;
+  #toolbar {
+    display: flex;
+    gap: 0.25em;
+    margin: 0.5em 0;
+  }
+  #toolbar button {
     width: 2em;
     height: 2em;
     font-size: 1.25rem;
@@ -44,7 +47,11 @@
 </head>
 <body>
 <h1>Simple Notepad</h1>
-<button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
+<div id="toolbar">
+  <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
+  <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
+  <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
+</div>
 <textarea id="note" placeholder="Start typing..."></textarea>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
 <div id="status"></div>
@@ -105,6 +112,53 @@ function toggleBullet() {
   save();
 }
 
+function indentSelection() {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+
+  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+  let lineEnd = text.indexOf('\n', end);
+  if (lineEnd === -1) lineEnd = text.length;
+
+  const before = text.slice(0, lineStart);
+  const after = text.slice(lineEnd);
+  const lines = text.slice(lineStart, lineEnd).split('\n');
+  const indented = lines.map(l => '  ' + l).join('\n');
+
+  textarea.value = before + indented + after;
+  textarea.selectionStart = lineStart;
+  textarea.selectionEnd = lineStart + indented.length;
+  save();
+}
+
+function outdentSelection() {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+
+  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+  let lineEnd = text.indexOf('\n', end);
+  if (lineEnd === -1) lineEnd = text.length;
+
+  const before = text.slice(0, lineStart);
+  const after = text.slice(lineEnd);
+  const lines = text.slice(lineStart, lineEnd).split('\n');
+  const outdented = lines
+    .map(l => l.startsWith('  ')
+      ? l.slice(2)
+      : l.startsWith('\t')
+        ? l.slice(1)
+        : l.replace(/^ /, '')
+    )
+    .join('\n');
+
+  textarea.value = before + outdented + after;
+  textarea.selectionStart = lineStart;
+  textarea.selectionEnd = lineStart + outdented.length;
+  save();
+}
+
 function load() {
   loadLocal();
   loadLastSync();
@@ -146,6 +200,8 @@ function save() {
 
 textarea.addEventListener('input', save);
 document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
+document.getElementById('indentBtn').addEventListener('click', indentSelection);
+document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
 
 load();
 </script>
