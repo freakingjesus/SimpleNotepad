@@ -51,6 +51,8 @@
   <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
   <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
   <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
+  <button id="undoBtn" type="button" aria-label="Undo">↺</button>
+  <button id="redoBtn" type="button" aria-label="Redo">↻</button>
 </div>
 <textarea id="note" placeholder="Start typing..."></textarea>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
@@ -63,9 +65,14 @@ const syncTime = document.getElementById('syncTime');
 const LAST_SYNC_KEY = 'last-sync-time';
 const STORAGE_KEY = 'notepad-content';
 const SERVER_URL = 'https://testing-39z9.onrender.com';
+const undoStack = [];
+const redoStack = [];
+let lastValue = '';
+const MAX_STACK = 50;
 
 function loadLocal() {
   textarea.value = localStorage.getItem(STORAGE_KEY) || '';
+  lastValue = textarea.value;
 }
 
 function loadLastSync() {
@@ -89,7 +96,34 @@ function setSync(success) {
   }
 }
 
+function pushUndo(state) {
+  undoStack.push(state);
+  if (undoStack.length > MAX_STACK) undoStack.shift();
+  redoStack.length = 0;
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(textarea.value);
+  if (redoStack.length > MAX_STACK) redoStack.shift();
+  const value = undoStack.pop();
+  textarea.value = value;
+  lastValue = value;
+  save();
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(textarea.value);
+  if (undoStack.length > MAX_STACK) undoStack.shift();
+  const value = redoStack.pop();
+  textarea.value = value;
+  lastValue = value;
+  save();
+}
+
 function toggleBullet() {
+  pushUndo(textarea.value);
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
@@ -109,10 +143,12 @@ function toggleBullet() {
   textarea.value = before + toggled + after;
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + toggled.length;
+  lastValue = textarea.value;
   save();
 }
 
 function indentSelection() {
+  pushUndo(textarea.value);
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
@@ -130,10 +166,12 @@ function indentSelection() {
   textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + indented.length;
+  lastValue = textarea.value;
   save();
 }
 
 function outdentSelection() {
+  pushUndo(textarea.value);
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
@@ -158,6 +196,13 @@ function outdentSelection() {
   textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + outdented.length;
+  lastValue = textarea.value;
+  save();
+}
+
+function handleInput() {
+  pushUndo(lastValue);
+  lastValue = textarea.value;
   save();
 }
 
@@ -171,11 +216,13 @@ function load() {
         textarea.value = text;
         localStorage.setItem(STORAGE_KEY, text);
       }
+      lastValue = textarea.value;
       setSync(true);
     })
     .catch(() => {
       status.textContent = 'Unable to reach server';
       setSync(false);
+      lastValue = textarea.value;
     });
 }
 
@@ -200,10 +247,22 @@ function save() {
   }, 1000);
 }
 
-textarea.addEventListener('input', save);
+textarea.addEventListener('input', handleInput);
 document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
 document.getElementById('indentBtn').addEventListener('click', indentSelection);
 document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
+document.getElementById('undoBtn').addEventListener('click', undo);
+document.getElementById('redoBtn').addEventListener('click', redo);
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+    e.preventDefault();
+    undo();
+  } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
+    e.preventDefault();
+    redo();
+  }
+});
 
 load();
 </script>
