@@ -53,13 +53,16 @@
   <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
   <button id="undoBtn" type="button" aria-label="Undo">↺</button>
   <button id="redoBtn" type="button" aria-label="Redo">↻</button>
+  <button id="geminiBtn" type="button" aria-label="Gemini">Gemini</button>
 </div>
 <textarea id="note" placeholder="Start typing..."></textarea>
 <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
 <div id="status"></div>
+<span id="geminiResult"></span>
 <script>
 const textarea = document.getElementById('note');
 const status = document.getElementById('status');
+const geminiResult = document.getElementById('geminiResult');
 const syncIndicator = document.getElementById('syncIndicator');
 const syncTime = document.getElementById('syncTime');
 const LAST_SYNC_KEY = 'last-sync-time';
@@ -251,12 +254,30 @@ function save() {
   }, 1000);
 }
 
+function runGemini() {
+  const prompt = textarea.value;
+  geminiResult.textContent = 'Thinking...';
+  fetch(`${SERVER_URL}/gemini`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt })
+  })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      geminiResult.textContent = data.text || '';
+    })
+    .catch(() => {
+      geminiResult.textContent = 'Error contacting Gemini';
+    });
+}
+
 textarea.addEventListener('input', handleInput);
 document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
 document.getElementById('indentBtn').addEventListener('click', indentSelection);
 document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
 document.getElementById('undoBtn').addEventListener('click', undo);
 document.getElementById('redoBtn').addEventListener('click', redo);
+document.getElementById('geminiBtn').addEventListener('click', runGemini);
 
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
