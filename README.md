@@ -25,7 +25,8 @@ After a few moments, visit that URL to see the notepad hosted online.
 ## Syncing Across Devices
 
 The notepad stores data in your browser by default. To share notes between
-different browsers or devices, run the included Node.js server:
+different browsers or devices, run the included Node.js server. The server
+requires **Node.js 18 or newer**:
 
 ```bash
 npm install
