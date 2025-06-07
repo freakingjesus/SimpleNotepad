@@ -317,12 +317,13 @@ textarea.addEventListener('keydown', e => {
     while (i < text.length && (text[i] === ' ' || text[i] === '\t')) {
       indent += text[i++];
     }
-    if (text.slice(i, i + bullet.length) === bullet) {
+    const hasBullet = text.slice(i, i + bullet.length) === bullet;
+    if (hasBullet || indent) {
       e.preventDefault();
       pushUndo(textarea.value);
       const before = text.slice(0, pos);
       const after = text.slice(pos);
-      const insert = '\n' + indent + bullet;
+      const insert = '\n' + indent + (hasBullet ? bullet : '');
       textarea.value = before + insert + after;
       const newPos = pos + insert.length;
       textarea.selectionStart = textarea.selectionEnd = newPos;
