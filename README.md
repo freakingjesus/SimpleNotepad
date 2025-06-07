@@ -42,6 +42,17 @@ GEMINI_API_KEY=your_key npm start
 
 This runs the `start` script defined in `package.json`.
 
+## Enabling the Gemini API
+
+Before using Gemini features, you must enable the API in your Google Cloud project:
+
+1. Open the [Google Cloud Console](https://console.cloud.google.com/).
+2. Select your project or create a new one.
+3. Go to **APIs & Services** → **Library** and search for "Generative Language API" (also known as the Google Gemini API).
+4. Click **Enable**.
+
+Create an API key in the same project and supply it to the server. The key must belong to the project where the API is enabled. See Google's [Generative AI quickstart](https://ai.google.dev/docs/start) for details.
+
 ## Setting `GEMINI_API_KEY` in Production
 
 On a hosting provider like [Render](https://render.com/), set the
