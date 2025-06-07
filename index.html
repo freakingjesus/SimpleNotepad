@@ -220,13 +220,11 @@ function handleInput() {
   save();
 }
 
-function load() {
-  loadLocal();
-  loadLastSync();
+function fetchNotes() {
   fetch(`${SERVER_URL}/notes`)
     .then(r => r.ok ? r.text() : '')
     .then(text => {
-      if (text) {
+      if (text && text !== textarea.value) {
         textarea.value = text;
         localStorage.setItem(STORAGE_KEY, text);
       }
@@ -238,6 +236,12 @@ function load() {
       setSync(false);
       lastValue = textarea.value;
     });
+}
+
+function load() {
+  loadLocal();
+  loadLastSync();
+  fetchNotes();
 }
 
 function save() {
@@ -325,6 +329,11 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     redo();
   }
+});
+
+window.addEventListener('focus', fetchNotes);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') fetchNotes();
 });
 
 load();
