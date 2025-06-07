@@ -7,10 +7,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const FILE = path.join(__dirname, 'notes.txt');
 
-// Use the newer Gemini 1.5 Pro model for API requests.
+// Use the Gemini 1.5 Pro 002 model for API requests.
 // See https://ai.google.dev/docs/start for available model names.
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent';
+  'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent';
 
 app.use(cors());
 app.use(express.json());
