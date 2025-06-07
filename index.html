@@ -124,9 +124,10 @@ function indentSelection() {
   const before = text.slice(0, lineStart);
   const after = text.slice(lineEnd);
   const lines = text.slice(lineStart, lineEnd).split('\n');
-  const indented = lines.map(l => '  ' + l).join('\n');
+  const indented = lines.map(l => '    ' + l).join('\n');
 
   textarea.value = before + indented + after;
+  textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + indented.length;
   save();
@@ -145,15 +146,16 @@ function outdentSelection() {
   const after = text.slice(lineEnd);
   const lines = text.slice(lineStart, lineEnd).split('\n');
   const outdented = lines
-    .map(l => l.startsWith('  ')
-      ? l.slice(2)
+    .map(l => l.startsWith('    ')
+      ? l.slice(4)
       : l.startsWith('\t')
         ? l.slice(1)
-        : l.replace(/^ /, '')
+        : l.replace(/^ {1,4}/, '')
     )
     .join('\n');
 
   textarea.value = before + outdented + after;
+  textarea.focus();
   textarea.selectionStart = lineStart;
   textarea.selectionEnd = lineStart + outdented.length;
   save();
