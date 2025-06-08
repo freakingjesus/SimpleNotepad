@@ -307,7 +307,10 @@ document.getElementById('redoBtn').addEventListener('click', redo);
 document.getElementById('geminiBtn').addEventListener('click', runGemini);
 
 textarea.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && textarea.selectionStart === textarea.selectionEnd) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (e.shiftKey) outdentSelection(); else indentSelection();
+  } else if (e.key === 'Enter' && textarea.selectionStart === textarea.selectionEnd) {
     const pos = textarea.selectionStart;
     const text = textarea.value;
     const bullet = '• ';
