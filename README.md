@@ -5,7 +5,8 @@ your web browser and begin typing to save notes. Your text is automatically
 stored in the browser so you can return to the page later and continue where you
 left off. The layout now adapts better to small screens so you can comfortably
 use it on phones and tablets. A small bullet button lets you toggle a
-• bullet at the start of each selected line.
+• bullet at the start of each selected line. A refresh button in the toolbar
+pulls the latest notes from the server when you want to sync manually.
 
 ## Hosting with GitHub Pages
 
@@ -41,6 +42,9 @@ GEMINI_API_KEY=your_key npm start
 ```
 
 This runs the `start` script defined in `package.json`.
+
+When switching devices, click the refresh button in the toolbar to pull the
+latest saved notes from the server.
 
 ## Enabling the Gemini API
 
