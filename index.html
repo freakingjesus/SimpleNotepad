@@ -235,7 +235,7 @@ function handleInput() {
 }
 
 function fetchNotes() {
-  fetch(`${SERVER_URL}/notes`)
+  fetch(`${SERVER_URL}/notes`, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : '')
     .then(text => {
       if (text && text !== textarea.value) {
