@@ -62,6 +62,7 @@
   <button id="redoBtn" type="button" aria-label="Redo">↻</button>
   <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
   <button id="gaBtn" type="button" aria-label="Copy to Google AI">GA</button>
+  <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
   <span id="geminiResult"></span>
 </div>
 <textarea id="note" placeholder="Start typing..."></textarea>
@@ -234,7 +235,8 @@ function handleInput() {
 }
 
 function fetchNotes() {
-  fetch(`${SERVER_URL}/notes`)
+  const url = `${SERVER_URL}/notes?t=${Date.now()}`;
+  fetch(url, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : '')
     .then(text => {
       if (text && text !== textarea.value) {
@@ -324,6 +326,7 @@ document.getElementById('undoBtn').addEventListener('click', undo);
 document.getElementById('redoBtn').addEventListener('click', redo);
 document.getElementById('geminiBtn').addEventListener('click', runGemini);
 document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
+document.getElementById('syncBtn').addEventListener('click', fetchNotes);
 
 textarea.addEventListener('keydown', e => {
   if (e.key === 'Tab') {
