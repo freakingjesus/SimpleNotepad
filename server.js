@@ -30,7 +30,10 @@ async function saveNotes(content) {
 app.get('/notes', async (req, res) => {
   try {
     const content = await loadNotes();
-    res.type('text/plain').send(content);
+    res
+      .type('text/plain')
+      .set('Cache-Control', 'no-store')
+      .send(content);
   } catch (err) {
     res.sendStatus(500);
   }
