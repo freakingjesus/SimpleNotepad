@@ -82,6 +82,13 @@ const redoStack = [];
 let lastValue = '';
 const MAX_STACK = 50;
 
+function linkify(text) {
+  const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
+  const escaped = text.replace(/[&<>]/g, c => escapeMap[c] || c);
+  return escaped.replace(/(https?:\/\/\S+)/g,
+    url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+}
+
 function loadLocal() {
   textarea.value = localStorage.getItem(STORAGE_KEY) || '';
   lastValue = textarea.value;
@@ -234,7 +241,7 @@ function handleInput() {
   save();
 }
 
-function fetchNotes() {
+  function fetchNotes() {
   const url = `${SERVER_URL}/notes?t=${Date.now()}`;
   fetch(url, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : '')
@@ -293,7 +300,7 @@ function runGemini() {
       if (data.error) {
         geminiResult.textContent = data.error;
       } else {
-        geminiResult.textContent = data.text || '';
+        geminiResult.innerHTML = linkify(data.text || '');
       }
     })
     .catch(() => {
