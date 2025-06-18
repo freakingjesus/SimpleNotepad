@@ -32,3 +32,10 @@ requires **Node.js 18 or newer**:
 ```bash
 npm install
 npm start
+```
+
+## Authentication
+
+Set the `NOTES_PIN` environment variable when starting the server to
+require a matching `pin` value on `/notes` requests. The notepad UI will
+prompt for this pin and include it with requests.

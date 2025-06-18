@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FILE = path.join(__dirname, 'notes.txt');
+const NOTES_PIN = process.env.NOTES_PIN || '';
 
 // Use the Gemini 2.0 Flash model for API requests.
 // See https://ai.google.dev/docs/start for available model names.
@@ -28,6 +29,8 @@ async function saveNotes(content) {
 }
 
 app.get('/notes', async (req, res) => {
+  const pin = req.query.pin || req.get('pin');
+  if (NOTES_PIN && pin !== NOTES_PIN) return res.sendStatus(403);
   try {
     const content = await loadNotes();
     res
@@ -40,6 +43,8 @@ app.get('/notes', async (req, res) => {
 });
 
 app.post('/notes', async (req, res) => {
+  const pin = req.query.pin || req.get('pin');
+  if (NOTES_PIN && pin !== NOTES_PIN) return res.sendStatus(403);
   if (typeof req.body.content === 'string') {
     try {
       await saveNotes(req.body.content);
