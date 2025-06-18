@@ -81,10 +81,21 @@ const syncTime = document.getElementById('syncTime');
 const LAST_SYNC_KEY = 'last-sync-time';
 const STORAGE_KEY = 'notepad-content';
 const SERVER_URL = 'https://testing-39z9.onrender.com';
+const PIN_KEY = 'notes-pin';
+const DEFAULT_PIN = '0043';
 const undoStack = [];
 const redoStack = [];
 let lastValue = '';
 const MAX_STACK = 50;
+
+function getPin() {
+  let pin = localStorage.getItem(PIN_KEY);
+  if (!pin) {
+    pin = prompt('Enter PIN', DEFAULT_PIN) || DEFAULT_PIN;
+    localStorage.setItem(PIN_KEY, pin);
+  }
+  return pin || '';
+}
 
 function linkify(text) {
   const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
@@ -245,8 +256,9 @@ function handleInput() {
   save();
 }
 
-  function fetchNotes() {
-  const url = `${SERVER_URL}/notes?t=${Date.now()}`;
+function fetchNotes() {
+  const pin = getPin();
+  const url = `${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}&t=${Date.now()}`;
   fetch(url, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : '')
     .then(text => {
@@ -273,7 +285,8 @@ function load() {
 function save() {
   const content = textarea.value;
   localStorage.setItem(STORAGE_KEY, content);
-  fetch(`${SERVER_URL}/notes`, {
+  const pin = getPin();
+  fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content })
