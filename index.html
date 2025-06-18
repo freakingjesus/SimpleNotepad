@@ -87,6 +87,7 @@
     const redoStack = [];
     let lastValue = '';
     const MAX_STACK = 50;
+    let dirty = false;
 
     function getPin() {
       let pin = localStorage.getItem(PIN_KEY);
@@ -257,6 +258,13 @@
     }
 
     function fetchNotes() {
+      if (dirty) {
+        status.textContent = 'Unsynced changes – retrying save...';
+        save().then(success => {
+          if (success) fetchNotes();
+        });
+        return;
+      }
       const pin = getPin();
       const url = `${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}&t=${Date.now()}`;
       fetch(url, { cache: 'no-store' })
@@ -287,7 +295,7 @@
       localStorage.setItem(STORAGE_KEY, content);
       status.textContent = 'Saving...';
       const pin = getPin();
-      fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
+      return fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content })
@@ -296,14 +304,20 @@
           if (r.ok) {
             setSync(true);
             status.textContent = 'Saved';
+            dirty = false;
+            return true;
           } else {
             setSync(false);
             status.textContent = 'Saved locally – server unreachable.';
+            dirty = true;
+            return false;
           }
         })
         .catch(() => {
           status.textContent = 'Saved locally – server unreachable.';
           setSync(false);
+          dirty = true;
+          return false;
         })
         .finally(() => {
           setTimeout(() => {
