@@ -95,4 +95,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { loadNotes, saveNotes };
+module.exports = { loadNotes, saveNotes, app };
