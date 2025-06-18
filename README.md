@@ -21,3 +21,11 @@ The notepad stores data in your browser by default. To share notes between diffe
 npm install
 npm start
 ```
+
+This command launches the sync server on port 3000. While it runs, open `index.html` in your browser to use the notepad. Your notes automatically save and sync a few seconds after you stop typing. Click the ⟳ button anytime to pull the latest version from the server.
+
+To run the automated tests:
+
+```bash
+npm test
+```
