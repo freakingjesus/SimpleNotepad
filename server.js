@@ -6,8 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FILE = path.join(__dirname, 'notes.txt');
-const NOTES_PIN = process.env.NOTES_PIN || '';
-
+const NOTES_PIN = process.env.NOTES_PIN || '0043';
 // Use the Gemini 2.0 Flash model for API requests.
 // See https://ai.google.dev/docs/start for available model names.
 const GEMINI_URL =
