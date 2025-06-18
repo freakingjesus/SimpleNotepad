@@ -37,6 +37,5 @@ npm start
 ## Authentication
 
 Set the `NOTES_PIN` environment variable when starting the server to
-require a matching `pin` value on `/notes` requests. If `NOTES_PIN` is not
-defined, the server falls back to `0043`. The notepad UI will prompt for
-this pin (defaulting to `0043`) and include it with requests.
+require a matching `pin` value on `/notes` requests. The notepad UI will
+prompt for this pin and include it with requests.
