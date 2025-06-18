@@ -358,7 +358,8 @@
     }
 
     function runGemini() {
-      const prompt = textarea.value;
+      const now = new Date().toLocaleString();
+      const prompt = textarea.value + "\nCurrent date and time: " + now;
       geminiResult.textContent = 'Thinking...';
       fetch(`${SERVER_URL}/gemini`, {
         method: 'POST',
