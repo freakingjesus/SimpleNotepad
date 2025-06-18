@@ -29,3 +29,9 @@ To run the automated tests:
 ```bash
 npm test
 ```
+
+## Persistent Storage for `notes.txt`
+
+The Node.js backend saves notes in a file called `notes.txt` at the project root. When this file is lost, so are your notes. Local development keeps the file on disk, but most hosting providers reset the filesystem on each deploy or restart.
+
+If you want to keep notes when deploying to a platform like Render or Heroku, make sure the file is stored on persistent storage. On Render you can attach a disk in your service settings and mount it into the app directory so `notes.txt` survives restarts. Heroku doesn't preserve local files, so use an add-on such as Postgres or an S3 bucket and modify the server to write there instead. Any storage backend that persists between deployments will work.
