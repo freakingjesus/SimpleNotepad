@@ -1,391 +1,406 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simple Notepad</title>
-<link rel="icon" href="data:,">
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0 auto;
-    padding: 1rem;
-    max-width: 60ch;
-  }
-  textarea {
-    width: 100%;
-    min-height: 70vh;
-    font-size: clamp(1rem, 2.5vw, 1.125rem);
-    box-sizing: border-box;
-  }
-  h1 { text-align: center; }
-  #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
-  #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
-  #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
-  #toolbar {
-    display: flex;
-    gap: 0.25em;
-    margin: 0.5em 0;
-  }
-  #toolbar button {
-    width: 2em;
-    height: 2em;
-    font-size: 1.25rem;
-    line-height: 2em;
-    text-align: center;
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 0;
-    cursor: pointer;
-  }
-  #gaBtn {
-    color: #4285F4;
-    font-weight: bold;
-  }
-  #geminiResult {
-    font-size: 0.875rem;
-    line-height: 2em;
-    margin-left: 0.5em;
-    flex: 1;
-    overflow-wrap: anywhere;
-  }
-  @media (min-width: 600px) {
-    body { max-width: 800px; }
-    textarea { min-height: 80vh; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple Notepad</title>
+  <link rel="icon" href="data:,">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0 auto;
+      padding: 1rem;
+      max-width: 60ch;
+    }
+    textarea {
+      width: 100%;
+      min-height: 70vh;
+      font-size: clamp(1rem, 2.5vw, 1.125rem);
+      box-sizing: border-box;
+    }
+    h1 { text-align: center; }
+    #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
+    #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
+    #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
+    #toolbar {
+      display: flex;
+      gap: 0.25em;
+      margin: 0.5em 0;
+    }
+    #toolbar button {
+      width: 2em;
+      height: 2em;
+      font-size: 1.25rem;
+      line-height: 2em;
+      text-align: center;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0;
+      cursor: pointer;
+    }
+    #gaBtn {
+      color: #4285F4;
+      font-weight: bold;
+    }
+    #geminiResult {
+      font-size: 0.875rem;
+      line-height: 2em;
+      margin-left: 0.5em;
+      flex: 1;
+      overflow-wrap: anywhere;
+    }
+    @media (min-width: 600px) {
+      body { max-width: 800px; }
+      textarea { min-height: 80vh; }
+    }
+  </style>
 </head>
 <body>
-<h1>Simple Notepad</h1>
-<div id="toolbar">
-  <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
-  <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
-  <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
-  <button id="undoBtn" type="button" aria-label="Undo">↺</button>
-  <button id="redoBtn" type="button" aria-label="Redo">↻</button>
-  <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
-  <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
-  <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
-  <span id="geminiResult"></span>
-</div>
-<textarea id="note" placeholder="Start typing..."></textarea>
-<div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
-<div id="status"></div>
-<script>
-const textarea = document.getElementById('note');
-const status = document.getElementById('status');
-const geminiResult = document.getElementById('geminiResult');
-const syncIndicator = document.getElementById('syncIndicator');
-const syncTime = document.getElementById('syncTime');
-const LAST_SYNC_KEY = 'last-sync-time';
-const STORAGE_KEY = 'notepad-content';
-const SERVER_URL = 'https://testing-39z9.onrender.com';
-const undoStack = [];
-const redoStack = [];
-let lastValue = '';
-const MAX_STACK = 50;
+  <h1>Simple Notepad</h1>
+  <div id="toolbar">
+    <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
+    <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
+    <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
+    <button id="undoBtn" type="button" aria-label="Undo">↺</button>
+    <button id="redoBtn" type="button" aria-label="Redo">↻</button>
+    <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
+    <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
+    <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
+    <span id="geminiResult"></span>
+  </div>
+  <textarea id="note" placeholder="Start typing..."></textarea>
+  <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
+  <div id="status"></div>
+  <script>
+    const textarea = document.getElementById('note');
+    const status = document.getElementById('status');
+    const geminiResult = document.getElementById('geminiResult');
+    const syncIndicator = document.getElementById('syncIndicator');
+    const syncTime = document.getElementById('syncTime');
+    const LAST_SYNC_KEY = 'last-sync-time';
+    const STORAGE_KEY = 'notepad-content';
+    const SERVER_URL = 'https://testing-39z9.onrender.com';
+    const PIN_KEY = 'notes-pin';
+    const DEFAULT_PIN = '0043';
+    const undoStack = [];
+    const redoStack = [];
+    let lastValue = '';
+    const MAX_STACK = 50;
 
-function linkify(text) {
-  const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
-  const escaped = text.replace(/[&<>]/g, c => escapeMap[c] || c);
-  return escaped.replace(/(https?:\/\/\S+)/g,
-    url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
-}
-
-function loadLocal() {
-  textarea.value = localStorage.getItem(STORAGE_KEY) || '';
-  lastValue = textarea.value;
-}
-
-function loadLastSync() {
-  const t = localStorage.getItem(LAST_SYNC_KEY);
-  if (t) {
-    const date = new Date(t);
-    syncTime.textContent = `Last sync: ${date.toLocaleString()}`;
-    syncIndicator.style.background = 'green';
-  }
-}
-
-function setSync(success) {
-  const now = new Date();
-  if (success) {
-    syncIndicator.style.background = 'green';
-    syncTime.textContent = `Last sync: ${now.toLocaleString()}`;
-    localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
-  } else {
-    syncIndicator.style.background = 'red';
-    syncTime.textContent = `Sync failed: ${now.toLocaleString()}`;
-  }
-}
-
-function pushUndo(state) {
-  undoStack.push(state);
-  if (undoStack.length > MAX_STACK) undoStack.shift();
-  redoStack.length = 0;
-}
-
-function undo() {
-  if (!undoStack.length) return;
-  redoStack.push(textarea.value);
-  if (redoStack.length > MAX_STACK) redoStack.shift();
-  const value = undoStack.pop();
-  textarea.value = value;
-  lastValue = value;
-  save();
-}
-
-function redo() {
-  if (!redoStack.length) return;
-  undoStack.push(textarea.value);
-  if (undoStack.length > MAX_STACK) undoStack.shift();
-  const value = redoStack.pop();
-  textarea.value = value;
-  lastValue = value;
-  save();
-}
-
-function toggleBullet() {
-  pushUndo(textarea.value);
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-
-  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
-  let lineEnd = text.indexOf('\n', end);
-  if (lineEnd === -1) lineEnd = text.length;
-
-  const before = text.slice(0, lineStart);
-  const after = text.slice(lineEnd);
-  const lines = text.slice(lineStart, lineEnd).split('\n');
-  const bullet = '• ';
-  const toggled = lines
-    .map(l => {
-      const m = l.match(/^(\s*)(.*)$/);
-      let indent = m[1];
-      let rest = m[2];
-      if (rest.startsWith(bullet)) {
-        rest = rest.slice(bullet.length);
-        if (indent.startsWith('    ')) indent = indent.slice(4);
-        else if (indent.startsWith('\t')) indent = indent.slice(1);
-        return indent + rest;
+    function getPin() {
+      let pin = localStorage.getItem(PIN_KEY);
+      if (!pin) {
+        pin = prompt('Enter PIN', DEFAULT_PIN) || DEFAULT_PIN;
+        localStorage.setItem(PIN_KEY, pin);
       }
-      indent = '    ' + indent;
-      return indent + bullet + rest;
-    })
-    .join('\n');
-
-  textarea.value = before + toggled + after;
-  textarea.selectionStart = lineStart;
-  textarea.selectionEnd = lineStart + toggled.length;
-  lastValue = textarea.value;
-  save();
-}
-
-function indentSelection() {
-  pushUndo(textarea.value);
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const scrollPos = textarea.scrollTop;
-  const text = textarea.value;
-
-  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
-  let lineEnd = text.indexOf('\n', end);
-  if (lineEnd === -1) lineEnd = text.length;
-
-  const before = text.slice(0, lineStart);
-  const after = text.slice(lineEnd);
-  const lines = text.slice(lineStart, lineEnd).split('\n');
-  const indented = lines.map(l => '    ' + l).join('\n');
-
-  textarea.value = before + indented + after;
-  textarea.focus();
-  textarea.selectionStart = lineStart;
-  textarea.selectionEnd = lineStart + indented.length;
-  textarea.scrollTop = scrollPos;
-  lastValue = textarea.value;
-  save();
-}
-
-function outdentSelection() {
-  pushUndo(textarea.value);
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const scrollPos = textarea.scrollTop;
-  const text = textarea.value;
-
-  let lineStart = text.lastIndexOf('\n', start - 1) + 1;
-  let lineEnd = text.indexOf('\n', end);
-  if (lineEnd === -1) lineEnd = text.length;
-
-  const before = text.slice(0, lineStart);
-  const after = text.slice(lineEnd);
-  const lines = text.slice(lineStart, lineEnd).split('\n');
-  const outdented = lines
-    .map(l => l.startsWith('    ')
-      ? l.slice(4)
-      : l.startsWith('\t')
-        ? l.slice(1)
-        : l.replace(/^ {1,4}/, '')
-    )
-    .join('\n');
-
-  textarea.value = before + outdented + after;
-  textarea.focus();
-  textarea.selectionStart = lineStart;
-  textarea.selectionEnd = lineStart + outdented.length;
-  textarea.scrollTop = scrollPos;
-  lastValue = textarea.value;
-  save();
-}
-
-function handleInput() {
-  pushUndo(lastValue);
-  lastValue = textarea.value;
-  save();
-}
-
-  function fetchNotes() {
-  const url = `${SERVER_URL}/notes?t=${Date.now()}`;
-  fetch(url, { cache: 'no-store' })
-    .then(r => r.ok ? r.text() : '')
-    .then(text => {
-      if (text && text !== textarea.value) {
-        textarea.value = text;
-        localStorage.setItem(STORAGE_KEY, text);
-      }
-      lastValue = textarea.value;
-      setSync(true);
-    })
-    .catch(() => {
-      status.textContent = 'Unable to reach server';
-      setSync(false);
-      lastValue = textarea.value;
-    });
-}
-
-function load() {
-  loadLocal();
-  loadLastSync();
-  fetchNotes();
-}
-
-function save() {
-  const content = textarea.value;
-  localStorage.setItem(STORAGE_KEY, content);
-  fetch(`${SERVER_URL}/notes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content })
-  })
-    .then(r => {
-      if (r.ok) setSync(true); else setSync(false);
-    })
-    .catch(() => {
-      status.textContent = 'Unable to reach server';
-      setSync(false);
-    });
-  status.textContent = 'Saved';
-  setTimeout(() => {
-    if (status.textContent === 'Saved') status.textContent = '';
-  }, 1000);
-}
-
-function runGemini() {
-  const prompt = textarea.value;
-  geminiResult.textContent = 'Thinking...';
-  fetch(`${SERVER_URL}/gemini`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
-  })
-    .then(r => r.json())
-    .then(data => {
-      if (data.error) {
-        geminiResult.textContent = data.error;
-      } else {
-        geminiResult.innerHTML = linkify(data.text || '');
-      }
-    })
-    .catch(() => {
-      geminiResult.textContent = 'Error contacting Gemini';
-    });
-}
-
-function copyToGoogleAI() {
-  const text = textarea.value;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).finally(() => {
-      window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
-    });
-  } else {
-    const temp = document.createElement('textarea');
-    temp.value = text;
-    document.body.appendChild(temp);
-    temp.select();
-    try { document.execCommand('copy'); } catch (err) {}
-    document.body.removeChild(temp);
-    window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
-  }
-}
-
-textarea.addEventListener('input', handleInput);
-document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
-document.getElementById('indentBtn').addEventListener('click', indentSelection);
-document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
-document.getElementById('undoBtn').addEventListener('click', undo);
-document.getElementById('redoBtn').addEventListener('click', redo);
-document.getElementById('geminiBtn').addEventListener('click', runGemini);
-document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
-document.getElementById('syncBtn').addEventListener('click', fetchNotes);
-
-textarea.addEventListener('keydown', e => {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    if (e.shiftKey) outdentSelection(); else indentSelection();
-  } else if (e.key === 'Enter' && textarea.selectionStart === textarea.selectionEnd) {
-    const pos = textarea.selectionStart;
-    const text = textarea.value;
-    const bullet = '• ';
-    let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
-    let i = lineStart;
-    let indent = '';
-    while (i < text.length && (text[i] === ' ' || text[i] === '\t')) {
-      indent += text[i++];
+      return pin || '';
     }
-    const hasBullet = text.slice(i, i + bullet.length) === bullet;
-    if (hasBullet || indent) {
-      e.preventDefault();
+
+    function linkify(text) {
+      const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
+      const escaped = text.replace(/[&<>]/g, c => escapeMap[c] || c);
+      return escaped.replace(/(https?:\/\/\S+)/g,
+        url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+    }
+
+    function loadLocal() {
+      textarea.value = localStorage.getItem(STORAGE_KEY) || '';
+      lastValue = textarea.value;
+    }
+
+    function loadLastSync() {
+      const t = localStorage.getItem(LAST_SYNC_KEY);
+      if (t) {
+        const date = new Date(t);
+        syncTime.textContent = `Last sync: ${date.toLocaleString()}`;
+        syncIndicator.style.background = 'green';
+      }
+    }
+
+    function setSync(success) {
+      const now = new Date();
+      if (success) {
+        syncIndicator.style.background = 'green';
+        syncTime.textContent = `Last sync: ${now.toLocaleString()}`;
+        localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
+      } else {
+        syncIndicator.style.background = 'red';
+        syncTime.textContent = `Sync failed: ${now.toLocaleString()}`;
+      }
+    }
+
+    function pushUndo(state) {
+      undoStack.push(state);
+      if (undoStack.length > MAX_STACK) undoStack.shift();
+      redoStack.length = 0;
+    }
+
+    function undo() {
+      if (!undoStack.length) return;
+      redoStack.push(textarea.value);
+      if (redoStack.length > MAX_STACK) redoStack.shift();
+      const value = undoStack.pop();
+      textarea.value = value;
+      lastValue = value;
+      save();
+    }
+
+    function redo() {
+      if (!redoStack.length) return;
+      undoStack.push(textarea.value);
+      if (undoStack.length > MAX_STACK) undoStack.shift();
+      const value = redoStack.pop();
+      textarea.value = value;
+      lastValue = value;
+      save();
+    }
+
+    function toggleBullet() {
       pushUndo(textarea.value);
-      const before = text.slice(0, pos);
-      const after = text.slice(pos);
-      const insert = '\n' + indent + (hasBullet ? bullet : '');
-      textarea.value = before + insert + after;
-      const newPos = pos + insert.length;
-      textarea.selectionStart = textarea.selectionEnd = newPos;
-      textarea.scrollTop = textarea.scrollTop;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+
+      let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+      let lineEnd = text.indexOf('\n', end);
+      if (lineEnd === -1) lineEnd = text.length;
+
+      const before = text.slice(0, lineStart);
+      const after = text.slice(lineEnd);
+      const lines = text.slice(lineStart, lineEnd).split('\n');
+      const bullet = '• ';
+      const toggled = lines
+        .map(l => {
+          const m = l.match(/^(\s*)(.*)$/);
+          let indent = m[1];
+          let rest = m[2];
+          if (rest.startsWith(bullet)) {
+            rest = rest.slice(bullet.length);
+            if (indent.startsWith('    ')) indent = indent.slice(4);
+            else if (indent.startsWith('\t')) indent = indent.slice(1);
+            return indent + rest;
+          }
+          indent = '    ' + indent;
+          return indent + bullet + rest;
+        })
+        .join('\n');
+
+      textarea.value = before + toggled + after;
+      textarea.selectionStart = lineStart;
+      textarea.selectionEnd = lineStart + toggled.length;
       lastValue = textarea.value;
       save();
     }
-  }
-});
 
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
-    e.preventDefault();
-    undo();
-  } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
-    e.preventDefault();
-    redo();
-  }
-});
+    function indentSelection() {
+      pushUndo(textarea.value);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const scrollPos = textarea.scrollTop;
+      const text = textarea.value;
 
-window.addEventListener('focus', fetchNotes);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') fetchNotes();
-});
+      let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+      let lineEnd = text.indexOf('\n', end);
+      if (lineEnd === -1) lineEnd = text.length;
 
-load();
-</script>
+      const before = text.slice(0, lineStart);
+      const after = text.slice(lineEnd);
+      const lines = text.slice(lineStart, lineEnd).split('\n');
+      const indented = lines.map(l => '    ' + l).join('\n');
+
+      textarea.value = before + indented + after;
+      textarea.focus();
+      textarea.selectionStart = lineStart;
+      textarea.selectionEnd = lineStart + indented.length;
+      textarea.scrollTop = scrollPos;
+      lastValue = textarea.value;
+      save();
+    }
+
+    function outdentSelection() {
+      pushUndo(textarea.value);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const scrollPos = textarea.scrollTop;
+      const text = textarea.value;
+
+      let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+      let lineEnd = text.indexOf('\n', end);
+      if (lineEnd === -1) lineEnd = text.length;
+
+      const before = text.slice(0, lineStart);
+      const after = text.slice(lineEnd);
+      const lines = text.slice(lineStart, lineEnd).split('\n');
+      const outdented = lines
+        .map(l => l.startsWith('    ')
+          ? l.slice(4)
+          : l.startsWith('\t')
+            ? l.slice(1)
+            : l.replace(/^ {1,4}/, '')
+        )
+        .join('\n');
+
+      textarea.value = before + outdented + after;
+      textarea.focus();
+      textarea.selectionStart = lineStart;
+      textarea.selectionEnd = lineStart + outdented.length;
+      textarea.scrollTop = scrollPos;
+      lastValue = textarea.value;
+      save();
+    }
+
+    function handleInput() {
+      pushUndo(lastValue);
+      lastValue = textarea.value;
+      save();
+    }
+
+    function fetchNotes() {
+      const pin = getPin();
+      const url = `${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}&t=${Date.now()}`;
+      fetch(url, { cache: 'no-store' })
+        .then(r => r.ok ? r.text() : '')
+        .then(text => {
+          if (text && text !== textarea.value) {
+            textarea.value = text;
+            localStorage.setItem(STORAGE_KEY, text);
+          }
+          lastValue = textarea.value;
+          setSync(true);
+        })
+        .catch(() => {
+          status.textContent = 'Unable to reach server';
+          setSync(false);
+          lastValue = textarea.value;
+        });
+    }
+
+    function load() {
+      loadLocal();
+      loadLastSync();
+      fetchNotes();
+    }
+
+    function save() {
+      const content = textarea.value;
+      localStorage.setItem(STORAGE_KEY, content);
+      const pin = getPin();
+      fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      })
+        .then(r => {
+          if (r.ok) setSync(true); else setSync(false);
+        })
+        .catch(() => {
+          status.textContent = 'Unable to reach server';
+          setSync(false);
+        });
+      status.textContent = 'Saved';
+      setTimeout(() => {
+        if (status.textContent === 'Saved') status.textContent = '';
+      }, 1000);
+    }
+
+    function runGemini() {
+      const prompt = textarea.value;
+      geminiResult.textContent = 'Thinking...';
+      fetch(`${SERVER_URL}/gemini`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) {
+            geminiResult.textContent = data.error;
+          } else {
+            geminiResult.innerHTML = linkify(data.text || '');
+          }
+        })
+        .catch(() => {
+          geminiResult.textContent = 'Error contacting Gemini';
+        });
+    }
+
+    function copyToGoogleAI() {
+      const text = textarea.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).finally(() => {
+          window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
+        });
+      } else {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(temp);
+        window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
+      }
+    }
+
+    textarea.addEventListener('input', handleInput);
+    document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
+    document.getElementById('indentBtn').addEventListener('click', indentSelection);
+    document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
+    document.getElementById('undoBtn').addEventListener('click', undo);
+    document.getElementById('redoBtn').addEventListener('click', redo);
+    document.getElementById('geminiBtn').addEventListener('click', runGemini);
+    document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
+    document.getElementById('syncBtn').addEventListener('click', fetchNotes);
+
+    textarea.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (e.shiftKey) outdentSelection(); else indentSelection();
+      } else if (e.key === 'Enter' && textarea.selectionStart === textarea.selectionEnd) {
+        const pos = textarea.selectionStart;
+        const text = textarea.value;
+        const bullet = '• ';
+        let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+        let i = lineStart;
+        let indent = '';
+        while (i < text.length && (text[i] === ' ' || text[i] === '\t')) {
+          indent += text[i++];
+        }
+        const hasBullet = text.slice(i, i + bullet.length) === bullet;
+        if (hasBullet || indent) {
+          e.preventDefault();
+          pushUndo(textarea.value);
+          const before = text.slice(0, pos);
+          const after = text.slice(pos);
+          const insert = '\n' + indent + (hasBullet ? bullet : '');
+          textarea.value = before + insert + after;
+          const newPos = pos + insert.length;
+          textarea.selectionStart = textarea.selectionEnd = newPos;
+          textarea.scrollTop = textarea.scrollTop;
+          lastValue = textarea.value;
+          save();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+        e.preventDefault();
+        undo();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
+        e.preventDefault();
+        redo();
+      }
+    });
+
+    window.addEventListener('focus', fetchNotes);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') fetchNotes();
+    });
+
+    load();
+  </script>
 </body>
 </html>
+```

@@ -21,5 +21,3 @@ The notepad stores data in your browser by default. To share notes between diffe
 npm install
 npm start
 ```
-
-Then open `http://localhost:3000` in your browser.
