@@ -286,6 +286,7 @@
     function save() {
       const content = textarea.value;
       localStorage.setItem(STORAGE_KEY, content);
+      status.textContent = 'Saving...';
       const pin = getPin();
       fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
         method: 'POST',
@@ -293,16 +294,23 @@
         body: JSON.stringify({ content })
       })
         .then(r => {
-          if (r.ok) setSync(true); else setSync(false);
+          if (r.ok) {
+            setSync(true);
+            status.textContent = 'Saved';
+          } else {
+            setSync(false);
+            status.textContent = 'Saved locally – server unreachable.';
+          }
         })
         .catch(() => {
-          status.textContent = 'Unable to reach server';
+          status.textContent = 'Saved locally – server unreachable.';
           setSync(false);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            if (status.textContent === 'Saved') status.textContent = '';
+          }, 1000);
         });
-      status.textContent = 'Saved';
-      setTimeout(() => {
-        if (status.textContent === 'Saved') status.textContent = '';
-      }, 1000);
     }
 
     function runGemini() {
