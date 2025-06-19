@@ -21,9 +21,8 @@
       overflow-x: auto;
     }
     h1 { text-align: center; }
-    #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
-    #syncStatus { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
-    #syncIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: red; display: inline-block; }
+    #statusRow { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
+    #dirtyIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: green; display: inline-block; }
     #toolbar {
       display: flex;
       gap: 0.25em;
@@ -84,15 +83,12 @@
     <span id="geminiResult"></span>
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
-  <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
-  <div id="status"></div>
+  <div id="statusRow"><span id="dirtyIndicator"></span><span id="status"></span></div>
   <script>
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
     const geminiResult = document.getElementById('geminiResult');
-    const syncIndicator = document.getElementById('syncIndicator');
-    const syncTime = document.getElementById('syncTime');
-    const LAST_SYNC_KEY = 'last-sync-time';
+    const dirtyIndicator = document.getElementById('dirtyIndicator');
     const STORAGE_KEY = 'notepad-content';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
     const PIN_KEY = 'notes-pin';
@@ -125,25 +121,8 @@
       lastValue = textarea.value;
     }
 
-    function loadLastSync() {
-      const t = localStorage.getItem(LAST_SYNC_KEY);
-      if (t) {
-        const date = new Date(t);
-        syncTime.textContent = `Last sync: ${date.toLocaleString()}`;
-        syncIndicator.style.background = 'green';
-      }
-    }
-
-    function setSync(success) {
-      const now = new Date();
-      if (success) {
-        syncIndicator.style.background = 'green';
-        syncTime.textContent = `Last sync: ${now.toLocaleString()}`;
-        localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
-      } else {
-        syncIndicator.style.background = 'red';
-        syncTime.textContent = `Sync failed: ${now.toLocaleString()}`;
-      }
+    function updateDirtyIndicator() {
+      dirtyIndicator.style.background = dirty ? 'red' : 'green';
     }
 
     function pushUndo(state) {
@@ -295,7 +274,8 @@
           }
           if (!r.ok) {
             status.textContent = 'Unable to reach server';
-            setSync(false);
+            dirty = true;
+            updateDirtyIndicator();
             lastValue = textarea.value;
             throw new Error('Fetch failed');
           }
@@ -307,30 +287,33 @@
             localStorage.setItem(STORAGE_KEY, text);
           }
           lastValue = textarea.value;
-          setSync(true);
+          dirty = false;
+          updateDirtyIndicator();
         })
         .catch(() => {
           status.textContent = 'Unable to reach server';
-          setSync(false);
+          dirty = true;
+          updateDirtyIndicator();
           lastValue = textarea.value;
         });
     }
 
     function load() {
       loadLocal();
-      loadLastSync();
       fetchNotes();
+      updateDirtyIndicator();
     }
 
     function save() {
       const content = textarea.value;
       localStorage.setItem(STORAGE_KEY, content);
-      status.textContent = 'Saving...';
+      dirty = true;
+      updateDirtyIndicator();
       const pin = getPin();
       if (pin === null) {
         status.textContent = 'PIN required';
-        setSync(false);
         dirty = true;
+        updateDirtyIndicator();
         return Promise.resolve(false);
       }
       return fetch(`${SERVER_URL}/notes?pin=${encodeURIComponent(pin)}`, {
@@ -343,31 +326,25 @@
             localStorage.removeItem(PIN_KEY);
             status.textContent = 'Incorrect PIN';
             dirty = true;
-            setSync(false);
+            updateDirtyIndicator();
             return false;
           }
           if (r.ok) {
-            setSync(true);
-            status.textContent = 'Saved';
             dirty = false;
+            updateDirtyIndicator();
             return true;
           } else {
-            setSync(false);
             status.textContent = 'Saved locally – server unreachable.';
             dirty = true;
+            updateDirtyIndicator();
             return false;
           }
         })
         .catch(() => {
           status.textContent = 'Saved locally – server unreachable.';
-          setSync(false);
           dirty = true;
+          updateDirtyIndicator();
           return false;
-        })
-        .finally(() => {
-          setTimeout(() => {
-            if (status.textContent === 'Saved') status.textContent = '';
-          }, 1000);
         });
     }
 
