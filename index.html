@@ -43,6 +43,10 @@
       color: #4285F4;
       font-weight: bold;
     }
+    #o4Btn {
+      color: #10a37f;
+      font-weight: bold;
+    }
     #geminiResult {
       font-size: clamp(0.875rem, 2vw, 1rem);
       line-height: 2em;
@@ -72,6 +76,7 @@
     <button id="redoBtn" type="button" aria-label="Redo">↻</button>
     <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
+    <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">O4</button>
     <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
     <span id="geminiResult"></span>
   </div>
@@ -402,6 +407,23 @@
       }
     }
 
+    function copyToO4() {
+      const text = textarea.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).finally(() => {
+          window.open('https://chatgpt.com/?model=o4-mini-high', '_blank');
+        });
+      } else {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(temp);
+        window.open('https://chatgpt.com/?model=o4-mini-high', '_blank');
+      }
+    }
+
     textarea.addEventListener('input', handleInput);
     document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
     document.getElementById('indentBtn').addEventListener('click', indentSelection);
@@ -410,6 +432,7 @@
     document.getElementById('redoBtn').addEventListener('click', redo);
     document.getElementById('geminiBtn').addEventListener('click', runGemini);
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
+    document.getElementById('o4Btn').addEventListener('click', copyToO4);
     document.getElementById('syncBtn').addEventListener('click', fetchNotes);
 
     textarea.addEventListener('keydown', e => {
