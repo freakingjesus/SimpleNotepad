@@ -17,6 +17,8 @@
       min-height: 70vh;
       font-size: clamp(1rem, 2.5vw, 1.125rem);
       box-sizing: border-box;
+      white-space: pre;
+      overflow-x: auto;
     }
     h1 { text-align: center; }
     #status { font-size: 0.875rem; color: #555; margin-top: 5px; }
@@ -75,7 +77,7 @@
     <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
     <span id="geminiResult"></span>
   </div>
-  <textarea id="note" placeholder="Start typing..."></textarea>
+  <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
   <div id="syncStatus"><span id="syncIndicator"></span><span id="syncTime"></span></div>
   <div id="status"></div>
   <script>
