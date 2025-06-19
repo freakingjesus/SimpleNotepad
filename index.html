@@ -50,6 +50,13 @@
       flex: 1;
       overflow-wrap: anywhere;
     }
+    @media (max-width: 599px) {
+      #toolbar { flex-wrap: wrap; }
+      #geminiResult {
+        flex-basis: 100%;
+        margin-left: 0;
+      }
+    }
     @media (min-width: 600px) {
       body { max-width: 800px; }
       textarea { min-height: 80vh; }
