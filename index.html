@@ -444,10 +444,15 @@
       const pin = getPin();
       if (pin === null) return;
       fetch(`${SERVER_URL}/restore?pin=${encodeURIComponent(pin)}`)
-        .then(r => r.text())
-        .then(text => {
-          textarea.value = text;
-          save();
+        .then(r => {
+          if (r.ok) {
+            return r.text().then(text => {
+              textarea.value = text;
+              save();
+              status.textContent = 'Restored from cloud';
+            });
+          }
+          status.textContent = 'Restore failed';
         })
         .catch(() => {
           status.textContent = 'Restore failed';
