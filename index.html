@@ -80,6 +80,8 @@
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
     <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">o4</button>
     <button id="syncBtn" type="button" aria-label="Sync from server">⟳</button>
+    <button id="backupBtn" type="button" aria-label="Save to Cloud">⬆️</button>
+    <button id="restoreBtn" type="button" aria-label="Restore from Cloud">⬇️</button>
     <span id="geminiResult"></span>
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
@@ -426,6 +428,32 @@
       }
     }
 
+    function backupToCloud() {
+      const pin = getPin();
+      if (pin === null) return;
+      fetch(`${SERVER_URL}/backup?pin=${encodeURIComponent(pin)}`, { method: 'POST' })
+        .then(r => {
+          status.textContent = r.ok ? 'Backed up to cloud' : 'Backup failed';
+        })
+        .catch(() => {
+          status.textContent = 'Backup failed';
+        });
+    }
+
+    function restoreFromCloud() {
+      const pin = getPin();
+      if (pin === null) return;
+      fetch(`${SERVER_URL}/restore?pin=${encodeURIComponent(pin)}`)
+        .then(r => r.text())
+        .then(text => {
+          textarea.value = text;
+          save();
+        })
+        .catch(() => {
+          status.textContent = 'Restore failed';
+        });
+    }
+
     textarea.addEventListener('input', handleInput);
     document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
     document.getElementById('indentBtn').addEventListener('click', indentSelection);
@@ -436,6 +464,8 @@
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
     document.getElementById('o4Btn').addEventListener('click', copyToO4);
     document.getElementById('syncBtn').addEventListener('click', fetchNotes);
+    document.getElementById('backupBtn').addEventListener('click', backupToCloud);
+    document.getElementById('restoreBtn').addEventListener('click', restoreFromCloud);
 
     textarea.addEventListener('keydown', e => {
       if (e.key === 'Tab') {

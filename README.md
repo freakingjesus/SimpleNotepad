@@ -35,3 +35,22 @@ npm test
 The Node.js backend saves notes in a file called `notes.txt` at the project root. When this file is lost, so are your notes. Local development keeps the file on disk, but most hosting providers reset the filesystem on each deploy or restart.
 
 If you want to keep notes when deploying to a platform like Render or Heroku, make sure the file is stored on persistent storage. On Render you can attach a disk in your service settings and mount it into the app directory so `notes.txt` survives restarts. Heroku doesn't preserve local files, so use an add-on such as Postgres or an S3 bucket and modify the server to write there instead. Any storage backend that persists between deployments will work.
+
+## Optional Supabase Backup
+
+To store a copy of your notes in Supabase:
+
+1. Create a Supabase project and a table named `notes` with columns
+   `id` (integer, primary key) and `content` (text).
+2. From the project settings, copy the **Project URL** and your
+   **service role** API key.
+3. Set environment variables `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+   before starting the server.
+
+When these variables are defined the server provides two extra routes:
+
+- `POST /backup` – Upload the contents of `notes.txt` to the table.
+- `GET /restore` – Retrieve the stored text and overwrite `notes.txt`.
+
+The page adds **Save to Cloud** (⬆️) and **Restore from Cloud** (⬇️)
+buttons that call these routes.
