@@ -22,7 +22,20 @@
     }
     h1 { text-align: center; }
     #statusRow { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
-    #dirtyIndicator { width: 0.75em; height: 0.75em; border-radius: 50%; background: green; display: inline-block; }
+    #dirtyIndicator {
+      width: 0.75em;
+      height: 0.75em;
+      border-radius: 50%;
+      background: green;
+      display: inline-block;
+    }
+    #cloudIndicator {
+      width: 0.75em;
+      height: 0.75em;
+      border-radius: 50%;
+      background: green;
+      display: inline-block;
+    }
     #toolbar {
       display: flex;
       gap: 0.25em;
@@ -83,12 +96,13 @@
     <span id="geminiResult"></span>
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
-  <div id="statusRow"><span id="dirtyIndicator"></span><span id="status"></span></div>
+  <div id="statusRow"><span id="dirtyIndicator"></span><span id="cloudIndicator"></span><span id="status"></span></div>
   <script>
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
     const geminiResult = document.getElementById('geminiResult');
     const dirtyIndicator = document.getElementById('dirtyIndicator');
+    const cloudIndicator = document.getElementById('cloudIndicator');
     const STORAGE_KEY = 'notepad-content';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
     const PIN_KEY = 'notes-pin';
@@ -98,6 +112,7 @@
     let lastValue = '';
     const MAX_STACK = 50;
     let dirty = false;
+    let cloudDirty = false;
 
     function getPin() {
       let pin = localStorage.getItem(PIN_KEY);
@@ -123,6 +138,10 @@
 
     function updateDirtyIndicator() {
       dirtyIndicator.style.background = dirty ? 'red' : 'green';
+    }
+
+    function updateCloudIndicator() {
+      cloudIndicator.style.background = cloudDirty ? 'red' : 'green';
     }
 
     function pushUndo(state) {
@@ -302,13 +321,16 @@
       loadLocal();
       fetchNotes();
       updateDirtyIndicator();
+      updateCloudIndicator();
     }
 
     function save() {
       const content = textarea.value;
       localStorage.setItem(STORAGE_KEY, content);
       dirty = true;
+      cloudDirty = true;
       updateDirtyIndicator();
+      updateCloudIndicator();
       const pin = getPin();
       if (pin === null) {
         status.textContent = 'PIN required';
@@ -410,6 +432,10 @@
       fetch(`${SERVER_URL}/backup?pin=${encodeURIComponent(pin)}`, { method: 'POST' })
         .then(r => {
           status.textContent = r.ok ? 'Backed up to cloud' : 'Backup failed';
+          if (r.ok) {
+            cloudDirty = false;
+            updateCloudIndicator();
+          }
         })
         .catch(() => {
           status.textContent = 'Backup failed';
@@ -425,6 +451,8 @@
             return r.text().then(text => {
               textarea.value = text;
               save();
+              cloudDirty = false;
+              updateCloudIndicator();
               status.textContent = 'Restored from cloud';
             });
           }
