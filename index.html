@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Simple Notepad</title>
+  <title>Notepad</title>
   <link rel="icon" href="data:,">
   <style>
     body {
@@ -44,7 +44,7 @@
       font-weight: bold;
     }
     #geminiResult {
-      font-size: 0.875rem;
+      font-size: clamp(1rem, 2.5vw, 1.125rem);
       line-height: 2em;
       margin-left: 0.5em;
       flex: 1;
@@ -64,7 +64,6 @@
   </style>
 </head>
 <body>
-  <h1>Simple Notepad</h1>
   <div id="toolbar">
     <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
     <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
