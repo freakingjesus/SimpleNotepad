@@ -113,6 +113,7 @@
     const MAX_STACK = 50;
     let dirty = false;
     let cloudDirty = false;
+    let statusTimer;
 
     function getPin() {
       let pin = localStorage.getItem(PIN_KEY);
@@ -142,6 +143,16 @@
 
     function updateCloudIndicator() {
       cloudIndicator.style.background = cloudDirty ? 'red' : 'green';
+    }
+
+    function showStatus(message, timeout) {
+      status.textContent = message;
+      if (statusTimer) clearTimeout(statusTimer);
+      if (timeout) {
+        statusTimer = setTimeout(() => {
+          if (status.textContent === message) status.textContent = '';
+        }, timeout);
+      }
     }
 
     function pushUndo(state) {
@@ -431,14 +442,16 @@
       if (pin === null) return;
       fetch(`${SERVER_URL}/backup?pin=${encodeURIComponent(pin)}`, { method: 'POST' })
         .then(r => {
-          status.textContent = r.ok ? 'Backed up to cloud' : 'Backup failed';
           if (r.ok) {
             cloudDirty = false;
             updateCloudIndicator();
+            showStatus('Backed up to cloud', 3000);
+          } else {
+            showStatus('Backup failed');
           }
         })
         .catch(() => {
-          status.textContent = 'Backup failed';
+          showStatus('Backup failed');
         });
     }
 
@@ -453,13 +466,13 @@
               save();
               cloudDirty = false;
               updateCloudIndicator();
-              status.textContent = 'Restored from cloud';
+              showStatus('Restored from cloud', 3000);
             });
           }
-          status.textContent = 'Restore failed';
+          showStatus('Restore failed');
         })
         .catch(() => {
-          status.textContent = 'Restore failed';
+          showStatus('Restore failed');
         });
     }
 
