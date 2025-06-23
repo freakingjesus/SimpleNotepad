@@ -88,6 +88,7 @@
     <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
     <button id="undoBtn" type="button" aria-label="Undo">↺</button>
     <button id="redoBtn" type="button" aria-label="Redo">↻</button>
+    <button id="wrapBtn" type="button" aria-label="Toggle wrap">↩</button>
     <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
     <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">o4</button>
@@ -103,7 +104,9 @@
     const geminiResult = document.getElementById('geminiResult');
     const dirtyIndicator = document.getElementById('dirtyIndicator');
     const cloudIndicator = document.getElementById('cloudIndicator');
+    const wrapBtn = document.getElementById('wrapBtn');
     const STORAGE_KEY = 'notepad-content';
+    const WRAP_KEY = 'notepad-wrap';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
     const PIN_KEY = 'notes-pin';
     const DEFAULT_PIN = '0043';
@@ -113,6 +116,7 @@
     const MAX_STACK = 50;
     let dirty = false;
     let cloudDirty = false;
+    let wrapped = false;
     let statusTimer;
 
     function getPin() {
@@ -179,6 +183,17 @@
       textarea.value = value;
       lastValue = value;
       save();
+    }
+
+    function setWrapping(on) {
+      wrapped = on;
+      textarea.style.whiteSpace = on ? 'pre-wrap' : 'pre';
+      textarea.setAttribute('wrap', on ? 'soft' : 'off');
+      localStorage.setItem(WRAP_KEY, on ? '1' : '0');
+    }
+
+    function toggleWrap() {
+      setWrapping(!wrapped);
     }
 
     function toggleBullet() {
@@ -333,6 +348,7 @@
       fetchNotes();
       updateDirtyIndicator();
       updateCloudIndicator();
+      setWrapping(localStorage.getItem(WRAP_KEY) === '1');
     }
 
     function save() {
@@ -482,6 +498,7 @@
     document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
     document.getElementById('undoBtn').addEventListener('click', undo);
     document.getElementById('redoBtn').addEventListener('click', redo);
+    document.getElementById('wrapBtn').addEventListener('click', toggleWrap);
     document.getElementById('geminiBtn').addEventListener('click', runGemini);
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
     document.getElementById('o4Btn').addEventListener('click', copyToO4);
