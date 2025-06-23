@@ -52,5 +52,5 @@ When these variables are defined the server provides two extra routes:
 - `POST /backup` – Upload the contents of `notes.txt` to the table.
 - `GET /restore` – Retrieve the stored text and overwrite `notes.txt`.
 
-The page adds **Save to Cloud** (⬆️) and **Restore from Cloud** (⬇️)
+The page adds **Save to Cloud** (💾) and **Restore from Cloud** (⬇️)
 buttons that call these routes.
