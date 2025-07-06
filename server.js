@@ -14,10 +14,10 @@ const supabase =
   SUPABASE_URL && SUPABASE_SERVICE_KEY
     ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     : null;
-// Use the Gemini 2.5 Flash model for API requests.
+// Use the Gemini 2.5 Pro model for API requests.
 // See https://ai.google.dev/docs/start for available model names.
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent';
 
 app.use(cors());
 app.use(express.json());
