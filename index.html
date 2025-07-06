@@ -88,6 +88,7 @@
     <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
     <button id="undoBtn" type="button" aria-label="Undo">↺</button>
     <button id="redoBtn" type="button" aria-label="Redo">↻</button>
+    <button id="cutLineBtn" type="button" aria-label="Cut line">✂️</button>
     <button id="wrapBtn" type="button" aria-label="Toggle wrap">↩</button>
     <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
@@ -285,6 +286,37 @@
       textarea.focus();
       textarea.selectionStart = lineStart;
       textarea.selectionEnd = lineStart + outdented.length;
+      textarea.scrollTop = scrollPos;
+      lastValue = textarea.value;
+      save();
+    }
+
+    function cutLine() {
+      pushUndo(textarea.value);
+      const pos = textarea.selectionStart;
+      const scrollPos = textarea.scrollTop;
+      const text = textarea.value;
+
+      let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+      let lineEnd = text.indexOf('\n', pos);
+      let sliceEnd = lineEnd === -1 ? text.length : lineEnd + 1;
+
+      const line = text.slice(lineStart, sliceEnd);
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(line);
+      } else {
+        const temp = document.createElement('textarea');
+        temp.value = line;
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(temp);
+      }
+
+      textarea.value = text.slice(0, lineStart) + text.slice(sliceEnd);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = lineStart;
       textarea.scrollTop = scrollPos;
       lastValue = textarea.value;
       save();
@@ -498,6 +530,7 @@
     document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
     document.getElementById('undoBtn').addEventListener('click', undo);
     document.getElementById('redoBtn').addEventListener('click', redo);
+    document.getElementById('cutLineBtn').addEventListener('click', cutLine);
     document.getElementById('wrapBtn').addEventListener('click', toggleWrap);
     document.getElementById('geminiBtn').addEventListener('click', runGemini);
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
