@@ -83,6 +83,8 @@
     <button id="redoBtn" type="button" aria-label="Redo">↻</button>
     <button id="cutLineBtn" type="button" aria-label="Cut line">✂️</button>
     <button id="wrapBtn" type="button" aria-label="Toggle wrap">↩</button>
+    <button id="saveBtn" type="button" aria-label="Save to Supabase">💾</button>
+    <button id="loadBtn" type="button" aria-label="Load from Supabase">⭮</button>
     <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
     <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">o4</button>
@@ -99,6 +101,8 @@
     const STORAGE_KEY = 'notepad-content';
     const WRAP_KEY = 'notepad-wrap';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
+    const SUPABASE_URL = 'https://kakhtozhcphemmmyclmz.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtha2h0b3poY3BoZW1tbXljbG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNTQ5MzksImV4cCI6MjA2NTkzMDkzOX0.Oe8GPcFpUWeDH1CG2lN2TQ8F4m4uVqq15jlhw4f-R0g';
     const PIN_KEY = "notes-pin";
     const DEFAULT_PIN = '0043';
     const undoStack = [];
@@ -129,6 +133,46 @@
     function loadLocal() {
       textarea.value = localStorage.getItem(STORAGE_KEY) || '';
       lastValue = textarea.value;
+    }
+
+    async function saveRemote() {
+      status.textContent = 'Saving...';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/notes`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify([{ id: 1, content: textarea.value }])
+        });
+        status.textContent = res.ok ? 'Saved' : 'Save failed';
+      } catch (err) {
+        status.textContent = 'Save error';
+      }
+    }
+
+    async function loadRemote() {
+      status.textContent = 'Loading...';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/notes?id=eq.1&select=content`, {
+          headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const content = data[0]?.content || '';
+          textarea.value = content;
+          lastValue = content;
+          save();
+          status.textContent = 'Loaded';
+        } else {
+          status.textContent = 'Load failed';
+        }
+      } catch (err) {
+        status.textContent = 'Load error';
+      }
     }
 
     function updateDirtyIndicator() {
@@ -379,6 +423,8 @@
     document.getElementById('redoBtn').addEventListener('click', redo);
     document.getElementById('cutLineBtn').addEventListener('click', cutLine);
     document.getElementById('wrapBtn').addEventListener('click', toggleWrap);
+    document.getElementById('saveBtn').addEventListener('click', saveRemote);
+    document.getElementById('loadBtn').addEventListener('click', loadRemote);
     document.getElementById('geminiBtn').addEventListener('click', runGemini);
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
     document.getElementById('o4Btn').addEventListener('click', copyToO4);

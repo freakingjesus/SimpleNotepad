@@ -15,7 +15,9 @@ After a few moments, visit that URL to see the notepad hosted online.
 
 ## Syncing Across Devices
 
-The notepad stores data in your browser only.
+Press **💾 Save** to store the current note in Supabase and **⭮ Load** to reload
+the saved copy. Notes are still stored locally as you type, but Supabase lets you
+pull the same content on another device.
 
 You can still run the Node.js server to access the Gemini endpoint. It requires **Node.js 18 or newer**:
 
