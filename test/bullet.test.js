@@ -12,7 +12,6 @@ describe('blank bullet enter behavior', () => {
       resources: 'usable',
       beforeParse(window) {
         window.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve('') });
-        window.prompt = () => '0043';
       }
     });
     const textarea = dom.window.document.getElementById('note');

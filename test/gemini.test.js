@@ -22,7 +22,6 @@ describe('runGemini', () => {
             text: () => Promise.resolve('')
           });
         };
-        window.prompt = () => '0043';
       }
     });
     dom.window.document.getElementById('note').value = 'hello';
