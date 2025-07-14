@@ -132,7 +132,7 @@
             apikey: SUPABASE_KEY,
             Authorization: 'Bearer ' + SUPABASE_KEY,
             'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates'
+            Prefer: 'return=minimal'
           },
           body: JSON.stringify([{ id: 1, content: textarea.value }])
         });
