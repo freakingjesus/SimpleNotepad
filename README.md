@@ -15,14 +15,15 @@ After a few moments, visit that URL to see the notepad hosted online.
 
 ## Syncing Across Devices
 
-The notepad stores data in your browser by default. To share notes between different browsers or devices, run the included Node.js server. The server requires **Node.js 18 or newer**:
+The notepad stores data in your browser by default. To share notes between different browsers or devices without running a server, add your Supabase credentials to `index.html`.
+Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` to the values from your project and the page will read and write the `notes` table automatically.
+
+You can still run the Node.js server if you want a local `notes.txt` copy or to access the Gemini endpoint. It requires **Node.js 18 or newer**:
 
 ```bash
 npm install
 npm start
 ```
-
-This command launches the sync server on port 3000. While it runs, open `index.html` in your browser to use the notepad. Your notes automatically save and sync a few seconds after you stop typing.
 
 To run the automated tests:
 
@@ -36,21 +37,13 @@ The Node.js backend saves notes in a file called `notes.txt` at the project root
 
 If you want to keep notes when deploying to a platform like Render or Heroku, make sure the file is stored on persistent storage. On Render you can attach a disk in your service settings and mount it into the app directory so `notes.txt` survives restarts. Heroku doesn't preserve local files, so use an add-on such as Postgres or an S3 bucket and modify the server to write there instead. Any storage backend that persists between deployments will work.
 
-## Optional Supabase Backup
+## Supabase Setup
 
-To store a copy of your notes in Supabase:
+Create a Supabase project and a table named `notes` with columns
+`id` (integer, primary key) and `content` (text). Copy your project's
+**URL** and **anon** API key.
 
-1. Create a Supabase project and a table named `notes` with columns
-   `id` (integer, primary key) and `content` (text).
-2. From the project settings, copy the **Project URL** and your
-   **service role** API key.
-3. Set environment variables `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
-   before starting the server.
-
-When these variables are defined the server provides two extra routes:
-
-- `POST /backup` – Upload the contents of `notes.txt` to the table.
-- `GET /restore` – Retrieve the stored text and overwrite `notes.txt`.
-
-The page adds **Save to Cloud** (💾) and **Restore from Cloud** (⬇️)
-buttons that call these routes.
+Edit `index.html` and set `SUPABASE_URL` and `SUPABASE_ANON_KEY` to those
+values. Once configured, the notepad automatically stores its text in the
+`notes` table. The **Save to Cloud** (💾) and **Restore from Cloud** (⬇️)
+buttons also use these credentials to push or pull the latest text.
