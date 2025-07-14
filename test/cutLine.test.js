@@ -13,7 +13,6 @@ describe('cutLine', () => {
       resources: 'usable',
       beforeParse(window) {
         window.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve('') });
-        window.prompt = () => '0043';
         window.navigator.clipboard = {
           writeText: text => { copied = text; return Promise.resolve(); }
         };

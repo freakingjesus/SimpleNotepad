@@ -103,8 +103,6 @@
     const SERVER_URL = 'https://testing-39z9.onrender.com';
     const SUPABASE_URL = 'https://kakhtozhcphemmmyclmz.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtha2h0b3poY3BoZW1tbXljbG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNTQ5MzksImV4cCI6MjA2NTkzMDkzOX0.Oe8GPcFpUWeDH1CG2lN2TQ8F4m4uVqq15jlhw4f-R0g';
-    const PIN_KEY = "notes-pin";
-    const DEFAULT_PIN = '0043';
     const undoStack = [];
     const redoStack = [];
     let lastValue = '';
@@ -112,16 +110,6 @@
     let dirty = false;
     let wrapped = false;
     let statusTimer;
-
-    function getPin() {
-      let pin = localStorage.getItem(PIN_KEY);
-      if (!pin) {
-        pin = prompt('Enter PIN');
-        if (!pin) return null;
-        localStorage.setItem(PIN_KEY, pin);
-      }
-      return pin || null;
-    }
 
     function linkify(text) {
       const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };

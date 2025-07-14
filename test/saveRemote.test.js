@@ -18,7 +18,6 @@ describe('saveRemote unauthorized', () => {
           text: () => Promise.resolve('')
         });
         window.alert = msg => { alertMsg = msg; };
-        window.prompt = () => '0043';
       }
     });
     dom.window.saveRemote();
