@@ -148,10 +148,15 @@
           },
           body: JSON.stringify([{ id: 1, content: textarea.value }])
         });
-        if (!res.ok) {
+        if (res.ok) {
+          status.textContent = 'Saved';
+        } else {
+          if (res.status === 401) {
+            alert('⚠️ Unable to save: Supabase permissions may be missing or misconfigured.');
+          }
           console.error('Save error', res.status, await res.text());
+          status.textContent = 'Save failed';
         }
-        status.textContent = res.ok ? 'Saved' : 'Save failed';
       } catch (err) {
         status.textContent = 'Save error';
       }
