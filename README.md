@@ -32,3 +32,12 @@ To run the automated tests:
 npm test
 ```
 
+## Supabase setup
+
+1. In Supabase create a new table named `notes` with columns:
+   - `id` UUID (primary key)
+   - `content` text
+2. Enable Row Level Security (RLS) on the table.
+3. Add an "Allow anon insert" policy so anyone can save notes.
+4. Update `SUPABASE_URL` and `SUPABASE_KEY` in `index.html` with
+your project's anon key values.
