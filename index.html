@@ -150,6 +150,9 @@
         });
         if (!res.ok) {
           console.error('Save error', res.status, await res.text());
+          if (res.status === 401) {
+            window.alert('Save failed: unauthorized');
+          }
         }
         status.textContent = res.ok ? 'Saved' : 'Save failed';
       } catch (err) {
