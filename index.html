@@ -148,6 +148,9 @@
           },
           body: JSON.stringify([{ id: 1, content: textarea.value }])
         });
+        if (!res.ok) {
+          console.error('Save error', res.status, await res.text());
+        }
         status.textContent = res.ok ? 'Saved' : 'Save failed';
       } catch (err) {
         status.textContent = 'Save error';
