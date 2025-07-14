@@ -29,13 +29,6 @@
       background: green;
       display: inline-block;
     }
-    #cloudIndicator {
-      width: 0.75em;
-      height: 0.75em;
-      border-radius: 50%;
-      background: green;
-      display: inline-block;
-    }
     #toolbar {
       display: flex;
       gap: 0.25em;
@@ -93,52 +86,26 @@
     <button id="geminiBtn" type="button" aria-label="Gemini">AI</button>
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
     <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">o4</button>
-    <button id="backupBtn" type="button" aria-label="Save to Cloud">💾</button>
-    <button id="restoreBtn" type="button" aria-label="Restore from Cloud">⬇️</button>
     <span id="geminiResult"></span>
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
-  <div id="statusRow"><span id="dirtyIndicator"></span><span id="cloudIndicator"></span><span id="status"></span></div>
+  <div id="statusRow"><span id="dirtyIndicator"></span><span id="status"></span></div>
   <script>
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
     const geminiResult = document.getElementById('geminiResult');
     const dirtyIndicator = document.getElementById('dirtyIndicator');
-    const cloudIndicator = document.getElementById('cloudIndicator');
     const wrapBtn = document.getElementById('wrapBtn');
     const STORAGE_KEY = 'notepad-content';
     const WRAP_KEY = 'notepad-wrap';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
-    const SUPABASE_URL = '{{ SUPABASE_URL }}';
-    const SUPABASE_ANON_KEY = '{{ SUPABASE_ANON_KEY }}';
-    if (
-      SUPABASE_URL &&
-      SUPABASE_ANON_KEY &&
-      !SUPABASE_URL.includes('{') &&
-      !SUPABASE_ANON_KEY.includes('{') &&
-      !navigator.userAgent.includes('jsdom')
-    ) {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-      document.head.appendChild(s);
-    }
-    const PIN_KEY = 'notes-pin';
-    let supabaseClient =
-      SUPABASE_URL &&
-      SUPABASE_ANON_KEY &&
-      !SUPABASE_URL.includes('{') &&
-      !SUPABASE_ANON_KEY.includes('{')
-        ? (window.supabase
-            ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-            : null)
-        : null;
+    const PIN_KEY = "notes-pin";
     const DEFAULT_PIN = '0043';
     const undoStack = [];
     const redoStack = [];
     let lastValue = '';
     const MAX_STACK = 50;
     let dirty = false;
-    let cloudDirty = false;
     let wrapped = false;
     let statusTimer;
 
@@ -166,56 +133,6 @@
 
     function updateDirtyIndicator() {
       dirtyIndicator.style.background = dirty ? 'red' : 'green';
-    }
-
-    function updateCloudIndicator() {
-      cloudIndicator.style.background = cloudDirty ? 'red' : 'green';
-    }
-
-    async function saveToSupabase(content) {
-      if (!supabaseClient && window.supabase) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-      if (!supabaseClient) return false;
-      try {
-        const { error } = await supabaseClient
-          .from('notes')
-          .upsert({ id: 1, content });
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        console.error('Supabase save failed', err);
-        return false;
-      }
-    }
-
-    async function loadFromSupabase() {
-      if (!supabaseClient && window.supabase) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-      if (!supabaseClient) return null;
-      try {
-        const { data, error } = await supabaseClient
-          .from('notes')
-          .select('content')
-          .eq('id', 1)
-          .single();
-        if (error) throw error;
-        return data?.content || '';
-      } catch (err) {
-        console.error('Supabase load failed', err);
-        return null;
-      }
-    }
-
-    function showStatus(message, timeout) {
-      status.textContent = message;
-      if (statusTimer) clearTimeout(statusTimer);
-      if (timeout) {
-        statusTimer = setTimeout(() => {
-          if (status.textContent === message) status.textContent = '';
-        }, timeout);
-      }
     }
 
     function pushUndo(state) {
@@ -386,64 +303,25 @@
       save();
     }
 
-    async function fetchNotes() {
-      if (dirty) {
-        status.textContent = 'Unsynced changes – retrying save...';
-        const success = await save();
-        if (success) fetchNotes();
-        return;
-      }
-      const text = await loadFromSupabase();
-      if (text === null) {
-        status.textContent = 'Unable to reach server';
-        dirty = true;
-        updateDirtyIndicator();
-        lastValue = textarea.value;
-        return;
-      }
-      if (text && text !== textarea.value) {
-        textarea.value = text;
-        localStorage.setItem(STORAGE_KEY, text);
-      }
-      lastValue = textarea.value;
-      dirty = false;
-      updateDirtyIndicator();
-    }
-
     function load() {
       loadLocal();
-      fetchNotes();
       updateDirtyIndicator();
-      updateCloudIndicator();
       setWrapping(localStorage.getItem(WRAP_KEY) === '1');
     }
 
-    async function save() {
+    function save() {
       const content = textarea.value;
       localStorage.setItem(STORAGE_KEY, content);
-      dirty = true;
-      cloudDirty = true;
+      dirty = false;
       updateDirtyIndicator();
-      updateCloudIndicator();
-      const ok = await saveToSupabase(content);
-      if (ok) {
-        dirty = false;
-        updateDirtyIndicator();
-        return true;
-      }
-      status.textContent = 'Saved locally – server unreachable.';
-      dirty = true;
-      updateDirtyIndicator();
-      return false;
     }
-
     function runGemini() {
       const now = new Date().toLocaleString();
       const prompt = textarea.value + "\nCurrent date and time: " + now;
-      geminiResult.textContent = 'Thinking...';
+      geminiResult.textContent = "Thinking...";
       fetch(`${SERVER_URL}/gemini`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt })
       })
         .then(r => r.json())
@@ -451,11 +329,11 @@
           if (data.error) {
             geminiResult.textContent = data.error;
           } else {
-            geminiResult.innerHTML = linkify(data.text || '');
+            geminiResult.innerHTML = linkify(data.text || "");
           }
         })
         .catch(() => {
-          geminiResult.textContent = 'Error contacting Gemini';
+          geminiResult.textContent = "Error contacting Gemini";
         });
     }
 
@@ -493,30 +371,6 @@
       }
     }
 
-    async function backupToCloud() {
-      const ok = await saveToSupabase(textarea.value);
-      if (ok) {
-        cloudDirty = false;
-        updateCloudIndicator();
-        showStatus('Backed up to cloud', 3000);
-      } else {
-        showStatus('Backup failed');
-      }
-    }
-
-    async function restoreFromCloud() {
-      const text = await loadFromSupabase();
-      if (text !== null) {
-        textarea.value = text;
-        save();
-        cloudDirty = false;
-        updateCloudIndicator();
-        showStatus('Restored from cloud', 3000);
-      } else {
-        showStatus('Restore failed');
-      }
-    }
-
     textarea.addEventListener('input', handleInput);
     document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
     document.getElementById('indentBtn').addEventListener('click', indentSelection);
@@ -528,8 +382,6 @@
     document.getElementById('geminiBtn').addEventListener('click', runGemini);
     document.getElementById('gaBtn').addEventListener('click', copyToGoogleAI);
     document.getElementById('o4Btn').addEventListener('click', copyToO4);
-    document.getElementById('backupBtn').addEventListener('click', backupToCloud);
-    document.getElementById('restoreBtn').addEventListener('click', restoreFromCloud);
 
     textarea.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
@@ -586,10 +438,6 @@
       }
     });
 
-    window.addEventListener('focus', fetchNotes);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') fetchNotes();
-    });
 
     load();
   </script>

@@ -15,10 +15,9 @@ After a few moments, visit that URL to see the notepad hosted online.
 
 ## Syncing Across Devices
 
-The notepad stores data in your browser by default. To share notes between different browsers or devices without running a server, add your Supabase credentials to `index.html`.
-Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` to the values from your project and the page will read and write the `notes` table automatically.
+The notepad stores data in your browser only.
 
-You can still run the Node.js server if you want a local `notes.txt` copy or to access the Gemini endpoint. It requires **Node.js 18 or newer**:
+You can still run the Node.js server to access the Gemini endpoint. It requires **Node.js 18 or newer**:
 
 ```bash
 npm install
@@ -31,19 +30,3 @@ To run the automated tests:
 npm test
 ```
 
-## Persistent Storage for `notes.txt`
-
-The Node.js backend saves notes in a file called `notes.txt` at the project root. When this file is lost, so are your notes. Local development keeps the file on disk, but most hosting providers reset the filesystem on each deploy or restart.
-
-If you want to keep notes when deploying to a platform like Render or Heroku, make sure the file is stored on persistent storage. On Render you can attach a disk in your service settings and mount it into the app directory so `notes.txt` survives restarts. Heroku doesn't preserve local files, so use an add-on such as Postgres or an S3 bucket and modify the server to write there instead. Any storage backend that persists between deployments will work.
-
-## Supabase Setup
-
-Create a Supabase project and a table named `notes` with columns
-`id` (integer, primary key) and `content` (text). Copy your project's
-**URL** and **anon** API key.
-
-Edit `index.html` and set `SUPABASE_URL` and `SUPABASE_ANON_KEY` to those
-values. Once configured, the notepad automatically stores its text in the
-`notes` table. The **Save to Cloud** (💾) and **Restore from Cloud** (⬇️)
-buttons also use these credentials to push or pull the latest text.

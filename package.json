@@ -12,7 +12,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@supabase/supabase-js": "^2.50.0",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   },
