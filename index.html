@@ -138,6 +138,7 @@
         });
         if (res.ok) {
           status.textContent = 'Saved';
+          markClean();
         } else {
           if (res.status === 401) {
             alert('⚠️ Save failed: unauthorized. Supabase permissions may be missing or misconfigured.');
@@ -162,7 +163,8 @@
           const content = data[0]?.content || '';
           textarea.value = content;
           lastValue = content;
-          save();
+          saveLocal();
+          markClean();
           status.textContent = 'Loaded';
         } else {
           status.textContent = 'Load failed';
@@ -174,6 +176,21 @@
 
     function updateDirtyIndicator() {
       dirtyIndicator.style.background = dirty ? 'red' : 'green';
+    }
+
+    function saveLocal() {
+      const content = textarea.value;
+      localStorage.setItem(STORAGE_KEY, content);
+    }
+
+    function markDirty() {
+      dirty = true;
+      updateDirtyIndicator();
+    }
+
+    function markClean() {
+      dirty = false;
+      updateDirtyIndicator();
     }
 
     function pushUndo(state) {
@@ -189,7 +206,7 @@
       const value = undoStack.pop();
       textarea.value = value;
       lastValue = value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function redo() {
@@ -199,7 +216,7 @@
       const value = redoStack.pop();
       textarea.value = value;
       lastValue = value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function setWrapping(on) {
@@ -247,7 +264,7 @@
       textarea.selectionStart = lineStart;
       textarea.selectionEnd = lineStart + toggled.length;
       lastValue = textarea.value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function indentSelection() {
@@ -272,7 +289,7 @@
       textarea.selectionEnd = lineStart + indented.length;
       textarea.scrollTop = scrollPos;
       lastValue = textarea.value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function outdentSelection() {
@@ -304,7 +321,7 @@
       textarea.selectionEnd = lineStart + outdented.length;
       textarea.scrollTop = scrollPos;
       lastValue = textarea.value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function cutLine() {
@@ -335,27 +352,21 @@
       textarea.selectionStart = textarea.selectionEnd = lineStart;
       textarea.scrollTop = scrollPos;
       lastValue = textarea.value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function handleInput() {
       pushUndo(lastValue);
       lastValue = textarea.value;
-      save();
+      saveLocal(); markDirty();
     }
 
     function load() {
       loadLocal();
-      updateDirtyIndicator();
+      markClean();
       setWrapping(localStorage.getItem(WRAP_KEY) === '1');
     }
 
-    function save() {
-      const content = textarea.value;
-      localStorage.setItem(STORAGE_KEY, content);
-      dirty = false;
-      updateDirtyIndicator();
-    }
     function runGemini() {
       const now = new Date().toLocaleString();
       const prompt = textarea.value + "\nCurrent date and time: " + now;
@@ -454,7 +465,7 @@
           const newPos = before.length + 1;
           textarea.selectionStart = textarea.selectionEnd = newPos;
           lastValue = textarea.value;
-          save();
+          saveLocal(); markDirty();
         } else if (hasBullet || indent) {
           e.preventDefault();
           pushUndo(textarea.value);
@@ -466,7 +477,7 @@
           textarea.selectionStart = textarea.selectionEnd = newPos;
           textarea.scrollTop = textarea.scrollTop;
           lastValue = textarea.value;
-          save();
+          saveLocal(); markDirty();
         }
       }
     });
