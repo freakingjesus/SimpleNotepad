@@ -21,7 +21,18 @@
       overflow-x: auto;
     }
     h1 { text-align: center; }
-    #statusRow { font-size: 0.875rem; margin-top: 5px; display: flex; align-items: center; gap: 0.5em; }
+    #statusRow {
+      font-size: 0.875rem;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      position: fixed;
+      top: 0.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+    }
     #dirtyIndicator {
       width: 0.75em;
       height: 0.75em;
