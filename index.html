@@ -137,6 +137,7 @@
           body: JSON.stringify([{ content: textarea.value }])
         });
         if (res.ok) {
+          await pruneOldNotes();
           status.textContent = 'Saved';
           markClean();
         } else {
@@ -149,6 +150,25 @@
         }
       } catch (err) {
         status.textContent = 'Save error';
+      }
+    }
+
+    async function pruneOldNotes() {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/notes?select=id&order=id.desc&offset=10`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
+        );
+        if (!res.ok) return;
+        const rows = await res.json();
+        for (const row of rows) {
+          await fetch(`${SUPABASE_URL}/rest/v1/notes?id=eq.${row.id}`, {
+            method: 'DELETE',
+            headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+          });
+        }
+      } catch (err) {
+        console.error('Prune error', err);
       }
     }
 
