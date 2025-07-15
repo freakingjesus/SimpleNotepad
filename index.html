@@ -111,6 +111,14 @@
     let wrapped = false;
     let statusTimer;
 
+    function showStatus(msg, delay = 2000) {
+      status.textContent = msg;
+      clearTimeout(statusTimer);
+      if (delay) {
+        statusTimer = setTimeout(() => { status.textContent = ''; }, delay);
+      }
+    }
+
     function linkify(text) {
       const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
       const escaped = text.replace(/[&<>]/g, c => escapeMap[c] || c);
@@ -124,7 +132,7 @@
     }
 
     async function saveRemote() {
-      status.textContent = 'Saving...';
+      showStatus('Saving...', 0);
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/notes`, {
           method: 'POST',
@@ -138,18 +146,18 @@
         });
         if (res.ok) {
           await pruneOldNotes();
-          status.textContent = 'Saved';
+            showStatus('Saved');
           markClean();
         } else {
           if (res.status === 401) {
             alert('⚠️ Save failed: unauthorized. Supabase permissions may be missing or misconfigured.');
           } else {
             console.error('Save error', res.status, await res.text());
-            status.textContent = 'Save failed';
+              showStatus('Save failed');
           }
         }
       } catch (err) {
-        status.textContent = 'Save error';
+          showStatus('Save error');
       }
     }
 
@@ -173,7 +181,7 @@
     }
 
     async function loadRemote() {
-      status.textContent = 'Loading...';
+      showStatus('Loading...', 0);
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/notes?select=content&order=id.desc&limit=1`, {
           headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
@@ -185,12 +193,12 @@
           lastValue = content;
           saveLocal();
           markClean();
-          status.textContent = 'Loaded';
+            showStatus('Loaded');
         } else {
-          status.textContent = 'Load failed';
+          showStatus('Load failed');
         }
       } catch (err) {
-        status.textContent = 'Load error';
+        showStatus('Load error');
       }
     }
 
