@@ -72,6 +72,29 @@
       body { max-width: 800px; }
       textarea { min-height: 80vh; }
     }
+    /* bottom corner navigation buttons */
+    #cornerButtons {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 1000;
+    }
+    #cornerButtons a {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -92,6 +115,10 @@
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
   <div id="statusRow"><span id="dirtyIndicator"></span><span id="status"></span></div>
+  <div id="cornerButtons">
+    <a id="squareLink" href="https://freakingjesus.github.io/BoxBreathing/" target="_blank" rel="noopener" aria-label="Box Breathing">&#9632;</a>
+    <a id="triangleLink" href="https://freakingjesus.github.io/VegusNerveReset/" target="_blank" rel="noopener" aria-label="Vagus Nerve Reset">&#9650;</a>
+  </div>
   <script>
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
