@@ -22,12 +22,14 @@ app.post('/gemini', async (req, res) => {
     return res.status(500).send('GEMINI_API_KEY missing');
   }
   try {
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      tools: [{ google_search: {} }]
+    };
     const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
+      body: JSON.stringify(body)
     });
     if (!response.ok) {
       const errText = await response.text();
@@ -35,9 +37,12 @@ app.post('/gemini', async (req, res) => {
       return res.status(500).json({ error: 'Gemini API error' });
     }
     const data = await response.json();
-    const text =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ text });
+    const candidate = data.candidates?.[0];
+    const part = candidate?.content?.parts?.[0];
+    const text = part?.text || '';
+    const citations =
+      part?.groundingMetadata?.webSearchQueries || [];
+    res.json({ text, citations });
   } catch (err) {
     console.error('Gemini handler error:', err);
     res.status(500).json({ error: err.message || 'Gemini request failed' });

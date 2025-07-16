@@ -26,6 +26,8 @@ npm install
 npm start
 ```
 
+The server requests Google Search grounding so Gemini can cite web results in its responses.
+
 To run the automated tests:
 
 ```bash
