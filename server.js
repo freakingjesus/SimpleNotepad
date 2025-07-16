@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 // Use the Gemini 2.5 Pro model for API requests.
 // See https://ai.google.dev/docs/start for available model names.
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent';
 
 app.use(cors());
 app.use(express.json());
