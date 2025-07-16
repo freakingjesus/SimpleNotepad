@@ -72,6 +72,11 @@
       flex: 1;
       overflow-wrap: anywhere;
     }
+    #geminiCitations {
+      margin: 0;
+      padding-left: 1em;
+      font-size: 0.875rem;
+    }
     @media (max-width: 599px) {
       #toolbar { flex-wrap: wrap; }
       #geminiResult {
@@ -123,6 +128,7 @@
     <button id="gaBtn" type="button" aria-label="Copy to Google AI">G</button>
     <button id="o4Btn" type="button" aria-label="Copy to ChatGPT o4">o4</button>
     <span id="geminiResult"></span>
+    <ul id="geminiCitations"></ul>
   </div>
   <textarea id="note" placeholder="Start typing..." wrap="off"></textarea>
   <div id="statusRow"><span id="dirtyIndicator"></span><span id="status"></span></div>
@@ -134,6 +140,7 @@
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
     const geminiResult = document.getElementById('geminiResult');
+    const geminiCitations = document.getElementById('geminiCitations');
     const dirtyIndicator = document.getElementById('dirtyIndicator');
     const wrapBtn = document.getElementById('wrapBtn');
     const STORAGE_KEY = 'notepad-content';
@@ -437,6 +444,7 @@
       const now = new Date().toLocaleString();
       const prompt = textarea.value + "\nCurrent date and time: " + now;
       geminiResult.textContent = "Thinking...";
+      geminiCitations.innerHTML = "";
       fetch(`${SERVER_URL}/gemini`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -448,6 +456,11 @@
             geminiResult.textContent = data.error;
           } else {
             geminiResult.innerHTML = linkify(data.text || "");
+            if (Array.isArray(data.citations)) {
+              geminiCitations.innerHTML = data.citations
+                .map(c => `<li><a href="${c.url}" target="_blank">${c.url}</a></li>`)
+                .join("");
+            }
           }
         })
         .catch(() => {
