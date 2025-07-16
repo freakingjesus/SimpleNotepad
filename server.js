@@ -41,7 +41,7 @@ app.post('/gemini', async (req, res) => {
     const part = candidate?.content?.parts?.[0];
     const text = part?.text || '';
     const citations =
-      part?.groundingMetadata?.webSearchQueries || [];
+      part?.groundingMetadata?.web_search_queries || [];
     res.json({ text, citations });
   } catch (err) {
     console.error('Gemini handler error:', err);
