@@ -458,7 +458,10 @@
             geminiResult.innerHTML = linkify(data.text || "");
             if (Array.isArray(data.citations)) {
               geminiCitations.innerHTML = data.citations
-                .map(c => `<li><a href="${c.url}" target="_blank">${c.url}</a></li>`)
+                .map(c => {
+                  const url = c.url || c;
+                  return `<li><a href="${url}" target="_blank">${url}</a></li>`;
+                })
                 .join("");
             }
           }
