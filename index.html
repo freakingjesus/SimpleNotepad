@@ -116,6 +116,7 @@
 <body>
   <div id="toolbar">
     <button id="bulletBtn" type="button" aria-label="Add bullet">&bull;</button>
+    <button id="checkboxBtn" type="button" aria-label="Add checkbox">☐</button>
     <button id="outdentBtn" type="button" aria-label="Remove indent">⇤</button>
     <button id="indentBtn" type="button" aria-label="Indent">⇥</button>
     <button id="undoBtn" type="button" aria-label="Undo">↺</button>
@@ -340,6 +341,43 @@
       saveLocal(); markDirty();
     }
 
+    function toggleCheckbox() {
+      pushUndo(textarea.value);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+
+      let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+      let lineEnd = text.indexOf('\n', end);
+      if (lineEnd === -1) lineEnd = text.length;
+
+      const before = text.slice(0, lineStart);
+      const after = text.slice(lineEnd);
+      const lines = text.slice(lineStart, lineEnd).split('\n');
+      const box = '☐ ';
+      const toggled = lines
+        .map(l => {
+          const m = l.match(/^(\s*)(.*)$/);
+          let indent = m[1];
+          let rest = m[2];
+          if (rest.startsWith(box)) {
+            rest = rest.slice(box.length);
+            if (indent.startsWith('    ')) indent = indent.slice(4);
+            else if (indent.startsWith('\t')) indent = indent.slice(1);
+            return indent + rest;
+          }
+          indent = '    ' + indent;
+          return indent + box + rest;
+        })
+        .join('\n');
+
+      textarea.value = before + toggled + after;
+      textarea.selectionStart = lineStart;
+      textarea.selectionEnd = lineStart + toggled.length;
+      lastValue = textarea.value;
+      saveLocal(); markDirty();
+    }
+
     function indentSelection() {
       pushUndo(textarea.value);
       const start = textarea.selectionStart;
@@ -507,6 +545,7 @@
 
     textarea.addEventListener('input', handleInput);
     document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
+    document.getElementById('checkboxBtn').addEventListener('click', toggleCheckbox);
     document.getElementById('indentBtn').addEventListener('click', indentSelection);
     document.getElementById('outdentBtn').addEventListener('click', outdentSelection);
     document.getElementById('undoBtn').addEventListener('click', undo);
@@ -527,6 +566,7 @@
         const pos = textarea.selectionStart;
         const text = textarea.value;
         const bullet = '• ';
+        const checkbox = '☐ ';
         let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
         let i = lineStart;
         let indent = '';
@@ -534,11 +574,13 @@
           indent += text[i++];
         }
         const hasBullet = text.slice(i, i + bullet.length) === bullet;
+        const hasCheckbox = text.slice(i, i + checkbox.length) === checkbox;
         let lineEnd = text.indexOf('\n', pos);
         if (lineEnd === -1) lineEnd = text.length;
-        const isBlankBullet =
-          hasBullet && pos === lineEnd && text.slice(i + bullet.length, lineEnd).trim() === '';
-        if (isBlankBullet) {
+        const prefix = hasBullet ? bullet : hasCheckbox ? checkbox : '';
+        const isBlankLine =
+          prefix && pos === lineEnd && text.slice(i + prefix.length, lineEnd).trim() === '';
+        if (isBlankLine) {
           e.preventDefault();
           pushUndo(textarea.value);
           const before = text.slice(0, lineStart);
@@ -548,12 +590,12 @@
           textarea.selectionStart = textarea.selectionEnd = newPos;
           lastValue = textarea.value;
           saveLocal(); markDirty();
-        } else if (hasBullet || indent) {
+        } else if (hasBullet || hasCheckbox || indent) {
           e.preventDefault();
           pushUndo(textarea.value);
           const before = text.slice(0, pos);
           const after = text.slice(pos);
-          const insert = '\n' + indent + (hasBullet ? bullet : '');
+          const insert = '\n' + indent + (prefix ? prefix : '');
           textarea.value = before + insert + after;
           const newPos = pos + insert.length;
           textarea.selectionStart = textarea.selectionEnd = newPos;
