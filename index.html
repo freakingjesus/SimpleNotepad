@@ -111,6 +111,11 @@
       color: inherit;
       font-size: 1.5rem;
     }
+    #completedList {
+      margin-top: 1rem;
+      list-style: none;
+      padding-left: 0;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +142,7 @@
     <a id="squareLink" href="https://freakingjesus.github.io/BoxBreathing/" target="_blank" rel="noopener" aria-label="Box Breathing">&#9632;</a>
     <a id="triangleLink" href="https://freakingjesus.github.io/VegusNerveReset/" target="_blank" rel="noopener" aria-label="Vagus Nerve Reset">&#9650;</a>
   </div>
+  <ul id="completedList"></ul>
   <script>
     const textarea = document.getElementById('note');
     const status = document.getElementById('status');
@@ -144,6 +150,7 @@
     const geminiCitations = document.getElementById('geminiCitations');
     const dirtyIndicator = document.getElementById('dirtyIndicator');
     const wrapBtn = document.getElementById('wrapBtn');
+    const completedList = document.getElementById('completedList');
     const STORAGE_KEY = 'notepad-content';
     const WRAP_KEY = 'notepad-wrap';
     const SERVER_URL = 'https://testing-39z9.onrender.com';
@@ -378,6 +385,30 @@
       saveLocal(); markDirty();
     }
 
+    function handleCheckboxClick() {
+      const pos = textarea.selectionStart;
+      const text = textarea.value;
+      let lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+      let lineEnd = text.indexOf('\n', lineStart);
+      if (lineEnd === -1) lineEnd = text.length;
+      const line = text.slice(lineStart, lineEnd);
+      const m = line.match(/^(\s*)☐\s+(.*)$/);
+      if (!m) return;
+      const boxStart = lineStart + m[1].length;
+      if (pos > boxStart + 1) return;
+      pushUndo(textarea.value);
+      const lines = text.split('\n');
+      const idx = text.slice(0, lineStart).split('\n').length - 1;
+      const item = lines.splice(idx, 1)[0].replace(/^\s*☐\s*/, '☑ ');
+      textarea.value = lines.join('\n');
+      lastValue = textarea.value;
+      saveLocal(); markDirty();
+      const li = document.createElement('li');
+      li.textContent = item.slice(2);
+      completedList.appendChild(li);
+      textarea.selectionStart = textarea.selectionEnd = lineStart;
+    }
+
     function indentSelection() {
       pushUndo(textarea.value);
       const start = textarea.selectionStart;
@@ -476,6 +507,7 @@
       loadLocal();
       markClean();
       setWrapping(localStorage.getItem(WRAP_KEY) === '1');
+      completedList.innerHTML = '';
     }
 
     function runGemini() {
@@ -544,6 +576,7 @@
     }
 
     textarea.addEventListener('input', handleInput);
+    textarea.addEventListener('click', handleCheckboxClick);
     document.getElementById('bulletBtn').addEventListener('click', toggleBullet);
     document.getElementById('checkboxBtn').addEventListener('click', toggleCheckbox);
     document.getElementById('indentBtn').addEventListener('click', indentSelection);
